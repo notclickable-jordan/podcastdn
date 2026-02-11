@@ -4,7 +4,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Podcast Generator",
+  title: "PodCastDN",
   description: "Convert YouTube videos and playlists into podcast RSS feeds",
 };
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Podcast } from "lucide-react";
+import { Cloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,18 +53,18 @@ export default function RegisterPage() {
   }
 
   return (
-    <Card className="border-0 shadow-none sm:border sm:shadow-sm">
+    <Card className="shadow-none sm:shadow-sm sm:border border-0">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-          <Podcast className="h-6 w-6" />
+        <div className="flex justify-center items-center bg-primary mx-auto mb-4 rounded-2xl w-12 h-12 text-primary-foreground">
+          <Cloud className="w-6 h-6" />
         </div>
         <CardTitle className="text-2xl">Create account</CardTitle>
-        <CardDescription>Get started with Podcast Generator</CardDescription>
+        <CardDescription>Get started with PodCastDN</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+            <div className="bg-destructive/10 p-3 rounded-lg text-destructive text-sm">
               {error}
             </div>
           )}
@@ -104,11 +104,11 @@ export default function RegisterPage() {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Creating account…" : "Create account"}
           </Button>
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm text-center">
             Already have an account?{" "}
             <Link
               href="/login"
-              className="text-foreground underline underline-offset-4 hover:text-primary"
+              className="text-foreground hover:text-primary underline underline-offset-4"
             >
               Sign in
             </Link>

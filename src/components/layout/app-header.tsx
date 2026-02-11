@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Podcast, Settings, Activity, LogOut } from "lucide-react";
+import { Cloud, Settings, Activity, LogOut, Podcast } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,15 +17,15 @@ export function AppHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+    <header className="top-0 z-40 sticky bg-background/80 backdrop-blur-xl border-b">
+      <div className="flex justify-between items-center mx-auto px-4 max-w-5xl h-14">
         <div className="flex items-center gap-6">
           <Link
             href="/podcasts"
-            className="flex items-center gap-2 font-semibold text-foreground hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 hover:opacity-80 font-semibold text-foreground transition-opacity"
           >
-            <Podcast className="h-5 w-5" />
-            <span className="hidden sm:inline">Podcast Generator</span>
+            <Cloud className="w-5 h-5" />
+            <span className="hidden sm:inline">PodCastDN</span>
           </Link>
           <nav className="flex items-center gap-1">
             {navItems.map((item) => (
@@ -39,7 +39,7 @@ export function AppHeader() {
                       "text-foreground bg-accent"
                   )}
                 >
-                  <item.icon className="h-4 w-4" />
+                  <item.icon className="w-4 h-4" />
                   <span className="hidden sm:inline">{item.label}</span>
                 </Button>
               </Link>
@@ -49,8 +49,8 @@ export function AppHeader() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
           <form action="/api/auth/signout" method="POST">
-            <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground">
-              <LogOut className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="w-9 h-9 text-muted-foreground">
+              <LogOut className="w-4 h-4" />
               <span className="sr-only">Sign out</span>
             </Button>
           </form>
