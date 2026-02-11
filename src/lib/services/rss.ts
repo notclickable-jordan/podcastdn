@@ -1,5 +1,6 @@
 import RSS from "rss";
 import { prisma } from "@/lib/prisma";
+import { s3 } from "@/lib/services/s3";
 
 export async function generateRssFeed(podcastId: string): Promise<string> {
   const podcast = await prisma.podcast.findUnique({
@@ -15,12 +16,13 @@ export async function generateRssFeed(podcastId: string): Promise<string> {
 
   if (!podcast) throw new Error("Podcast not found");
 
-  const siteUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const feedUrl = getRssFeedUrl(podcastId);
+  const siteUrl = getPublicBaseUrl();
 
   const feed = new RSS({
     title: podcast.title,
     description: podcast.description || "",
-    feed_url: `${siteUrl}/api/podcasts/${podcast.id}/rss`,
+    feed_url: feedUrl,
     site_url: siteUrl,
     image_url: podcast.artwork || undefined,
     language: podcast.language,
@@ -60,7 +62,7 @@ export async function generateRssFeed(podcastId: string): Promise<string> {
     feed.item({
       title: episode.title,
       description: episode.description || "",
-      url: `${siteUrl}/api/podcasts/${podcast.id}/rss`,
+      url: feedUrl,
       guid: episode.id,
       date: episode.createdAt,
       enclosure: {
@@ -88,7 +90,7 @@ export async function generateRssFeed(podcastId: string): Promise<string> {
     });
   }
 
-  return feed.xml({ indent: true });
+  return stripCdata(feed.xml({ indent: true }));
 }
 
 function formatItunesDuration(seconds: number): string {
@@ -98,4 +100,45 @@ function formatItunesDuration(seconds: number): string {
   if (h > 0)
     return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function getPublicBaseUrl(): string {
+  if (process.env.CUSTOM_DOMAIN) return `https://${process.env.CUSTOM_DOMAIN}`;
+  if (process.env.CLOUDFRONT_DOMAIN) return `https://${process.env.CLOUDFRONT_DOMAIN}`;
+  return process.env.NEXTAUTH_URL || "http://localhost:3000";
+}
+
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function stripCdata(xml: string): string {
+  return xml.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_, content) => escapeXml(content));
+}
+
+function getRssFeedKey(podcastId: string): string {
+  return `${podcastId}/feed.xml`;
+}
+
+export function getRssFeedUrl(podcastId: string): string {
+  return s3.getPublicUrl(getRssFeedKey(podcastId));
+}
+
+export async function publishRssFeed(podcastId: string): Promise<string> {
+  const xml = await generateRssFeed(podcastId);
+  const key = getRssFeedKey(podcastId);
+  const url = await s3.uploadContent(xml, key, "application/rss+xml; charset=utf-8");
+  await s3.invalidateCloudFront([key]).catch(() => {});
+  return url;
+}
+
+export async function deleteRssFeed(podcastId: string): Promise<void> {
+  const key = getRssFeedKey(podcastId);
+  await s3.deleteFile(key).catch(() => {});
+  await s3.invalidateCloudFront([key]).catch(() => {});
 }

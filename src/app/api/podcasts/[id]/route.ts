@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { podcastSchema } from "@/lib/validations";
+import { publishRssFeed, deleteRssFeed } from "@/lib/services/rss";
 
 export async function GET(
   _request: Request,
@@ -58,6 +59,9 @@ export async function PUT(
       data,
     });
 
+    // Republish RSS feed to S3
+    await publishRssFeed(id).catch(() => {});
+
     return NextResponse.json(podcast);
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
@@ -90,6 +94,9 @@ export async function DELETE(
   }
 
   await prisma.podcast.delete({ where: { id } });
+
+  // Clean up RSS feed from S3
+  await deleteRssFeed(id).catch(() => {});
 
   return NextResponse.json({ success: true });
 }

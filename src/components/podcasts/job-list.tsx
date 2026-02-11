@@ -8,8 +8,14 @@ import {
   Clock,
   Loader2,
   Activity,
+  Download,
+  ListVideo,
+  RefreshCw,
+  FileAudio,
+  Upload,
+  Image,
+  Search,
 } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 
 interface Job {
   id: string;
@@ -23,10 +29,16 @@ interface Job {
 }
 
 const statusIcons: Record<string, React.ReactNode> = {
-  pending: <Clock className="h-4 w-4 text-muted-foreground" />,
-  processing: <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />,
-  completed: <CheckCircle2 className="h-4 w-4 text-green-500" />,
-  failed: <XCircle className="h-4 w-4 text-destructive" />,
+  pending: <Clock className="w-4 h-4 text-muted-foreground" />,
+  processing: <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />,
+  completed: <CheckCircle2 className="w-4 h-4 text-green-500" />,
+  failed: <XCircle className="w-4 h-4 text-destructive" />,
+};
+
+const typeIcons: Record<string, React.ReactNode> = {
+  download_video: <Download className="w-4 h-4" />,
+  scan_playlist: <ListVideo className="w-4 h-4" />,
+  poll_sources: <RefreshCw className="w-4 h-4" />,
 };
 
 const typeLabels: Record<string, string> = {
@@ -34,6 +46,29 @@ const typeLabels: Record<string, string> = {
   scan_playlist: "Scan Playlist",
   poll_sources: "Poll Sources",
 };
+
+function getPhaseIcon(message: string | null): React.ReactNode | null {
+  if (!message) return null;
+  const lower = message.toLowerCase();
+  if (lower.includes("metadata") || lower.includes("scanning"))
+    return <Search className="w-3 h-3" />;
+  if (lower.includes("downloading"))
+    return <Download className="w-3 h-3" />;
+  if (lower.includes("extracting"))
+    return <FileAudio className="w-3 h-3" />;
+  if (lower.includes("uploading"))
+    return <Upload className="w-3 h-3" />;
+  if (lower.includes("thumbnail"))
+    return <Image className="w-3 h-3" />;
+  return null;
+}
+
+function getPhaseColor(progress: number): string {
+  if (progress < 6) return "bg-violet-500";
+  if (progress < 60) return "bg-blue-500";
+  if (progress < 90) return "bg-amber-500";
+  return "bg-green-500";
+}
 
 export function JobList() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -50,24 +85,24 @@ export function JobList() {
     }
 
     fetchJobs();
-    const interval = setInterval(fetchJobs, 5000);
+    const interval = setInterval(fetchJobs, 3000);
     return () => clearInterval(interval);
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="flex justify-center items-center py-16">
+        <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
       </div>
     );
   }
 
   if (jobs.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 px-4">
-        <Activity className="h-8 w-8 text-muted-foreground mb-3" />
-        <h3 className="text-lg font-semibold">No jobs</h3>
-        <p className="text-sm text-muted-foreground mt-1 text-center">
+      <div className="flex flex-col justify-center items-center px-4 py-16 border border-dashed rounded-2xl">
+        <Activity className="mb-3 w-8 h-8 text-muted-foreground" />
+        <h3 className="font-semibold text-lg">No jobs</h3>
+        <p className="mt-1 text-muted-foreground text-sm text-center">
           Jobs will appear here when you add content to a podcast.
         </p>
       </div>
@@ -79,32 +114,56 @@ export function JobList() {
       {jobs.map((job) => (
         <div
           key={job.id}
-          className="flex items-center gap-3 rounded-xl border bg-card p-3"
+          className="flex items-center gap-3 bg-card p-3 border rounded-xl"
         >
-          {statusIcons[job.status] || statusIcons.pending}
+          <div className="flex items-center gap-1.5">
+            {typeIcons[job.type] || <Activity className="w-4 h-4" />}
+            {statusIcons[job.status] || statusIcons.pending}
+          </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">
+              <span className="font-medium text-sm">
                 {typeLabels[job.type] || job.type}
               </span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-muted-foreground text-xs">
                 {formatDistanceToNow(new Date(job.createdAt), {
                   addSuffix: true,
                 })}
               </span>
             </div>
-            {job.message && (
-              <p className="text-xs text-muted-foreground mt-0.5">
+            {job.status === "processing" && (
+              <div className="space-y-1 mt-1.5">
+                <div className="flex justify-between items-center gap-2">
+                  <span className="flex items-center gap-1.5 min-w-0 text-muted-foreground text-xs truncate">
+                    {getPhaseIcon(job.message)}
+                    {job.message || "Processing…"}
+                  </span>
+                  <span className="font-medium tabular-nums text-muted-foreground text-xs shrink-0">
+                    {job.progress}%
+                  </span>
+                </div>
+                <div className="relative bg-secondary rounded-full w-full h-1.5 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ease-out ${getPhaseColor(job.progress)}`}
+                    style={{ width: `${job.progress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+            {job.status === "pending" && (
+              <p className="mt-0.5 text-muted-foreground text-xs">
+                Waiting in queue…
+              </p>
+            )}
+            {job.status === "completed" && job.message && (
+              <p className="mt-0.5 text-muted-foreground text-xs">
                 {job.message}
               </p>
             )}
             {job.error && (
-              <p className="text-xs text-destructive mt-0.5 truncate">
+              <p className="mt-0.5 text-destructive text-xs truncate">
                 {job.error}
               </p>
-            )}
-            {job.status === "processing" && (
-              <Progress value={job.progress} className="mt-2 h-1.5" />
             )}
           </div>
         </div>

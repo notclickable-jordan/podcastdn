@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { reorderSchema } from "@/lib/validations";
+import { publishRssFeed } from "@/lib/services/rss";
 
 export async function PUT(
   request: Request,
@@ -35,6 +36,9 @@ export async function PUT(
         })
       )
     );
+
+    // Republish RSS feed to S3
+    await publishRssFeed(id).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (error) {
