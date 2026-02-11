@@ -37,42 +37,50 @@ export default async function PodcastDetailPage({
       {/* Back navigation */}
       <Link
         href="/podcasts"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm transition-colors"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft className="w-4 h-4" />
         Back to podcasts
       </Link>
 
-      {/* Header */}
-      <EditPodcastForm podcast={podcast} />
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground">
-          {podcast.episodes.length} episode
-          {podcast.episodes.length !== 1 ? "s" : ""}
-        </span>
-      </div>
+      {/* Two-column header: info left, actions right */}
+      <div className="flex lg:flex-row flex-col lg:items-start gap-6">
+        {/* Left column — podcast info */}
+        <div className="flex-1 space-y-2 min-w-0">
+          <EditPodcastForm podcast={podcast} />
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground text-xs">
+              {podcast.episodes.length} episode
+              {podcast.episodes.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+        </div>
 
-      {/* RSS Feed URL */}
-      <div className="flex items-center gap-2 rounded-xl border bg-card p-3">
-        <Rss className="h-4 w-4 text-muted-foreground shrink-0" />
-        <code className="flex-1 text-sm font-mono text-muted-foreground truncate">
-          {rssUrl}
-        </code>
-        <CopyButton text={rssUrl} />
-        <PublishRssButton podcastId={podcast.id} />
-      </div>
+        {/* Right column — RSS feed + add content */}
+        <div className="space-y-4 w-full lg:w-80 xl:w-96 shrink-0">
+          {/* RSS Feed URL */}
+          <div className="flex items-center gap-2 bg-card p-3 border rounded-xl">
+            <Rss className="w-4 h-4 text-muted-foreground shrink-0" />
+            <code className="flex-1 font-mono text-muted-foreground text-sm truncate">
+              {rssUrl}
+            </code>
+            <CopyButton text={rssUrl} />
+            <PublishRssButton podcastId={podcast.id} />
+          </div>
 
-      {/* Add Content */}
-      <div className="space-y-3">
-        <h2 className="text-sm font-medium text-muted-foreground">
-          Add Content
-        </h2>
-        <AddContentForm podcastId={podcast.id} />
+          {/* Add Content */}
+          <div className="space-y-2">
+            <h2 className="font-medium text-muted-foreground text-sm">
+              Add Content
+            </h2>
+            <AddContentForm podcastId={podcast.id} />
+          </div>
+        </div>
       </div>
 
       {/* Episodes */}
       <div className="space-y-3">
-        <h2 className="text-sm font-medium text-muted-foreground">
+        <h2 className="font-medium text-muted-foreground text-sm">
           Episodes
         </h2>
         <EpisodeList episodes={podcast.episodes} podcastId={podcast.id} />
