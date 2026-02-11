@@ -29,8 +29,11 @@ A self-hosted Next.js application that converts YouTube videos and playlists int
 ### Phase 1: Project Setup
 - [ ] Initialize Next.js project with TypeScript
 - [ ] Set up project structure (app/, lib/, components/, types/)
+- [ ] Configure Tailwind CSS with dark mode support (class-based strategy)
+- [ ] Install and initialize shadcn/ui with light/dark theme configuration
 - [ ] Configure PostgreSQL connection with Prisma ORM
 - [ ] Create initial database schema (users, podcasts, episodes, sources)
+- [ ] Add theme preference to User model (light/dark/system)
 - [ ] Set up environment variable configuration
 - [ ] Create Dockerfile with multi-stage build
 - [ ] Add docker-compose.yml for local development (app + PostgreSQL)
@@ -109,30 +112,90 @@ A self-hosted Next.js application that converts YouTube videos and playlists int
 - [ ] Add caching for RSS feeds
 
 ### Phase 9: Frontend UI - Dashboard
-- [ ] Create main dashboard layout
-- [ ] List all user's podcasts with cards/thumbnails
-- [ ] Create "New Podcast" modal/page
-- [ ] Add search/filter functionality
-- [ ] Display podcast statistics (episode count, total duration)
+- [ ] Install and configure shadcn/ui components
+- [ ] Set up Tailwind CSS with custom Apple-inspired design tokens
+- [ ] Configure font stack (SF Pro or system font stack fallback)
+- [ ] Implement light/dark mode with smooth transitions
+- [ ] Create main dashboard layout with sidebar or top navigation
+- [ ] Design and implement podcast cards:
+  - Large, beautiful artwork thumbnails
+  - Subtle shadows and rounded corners
+  - Smooth hover states with scale/shadow transitions
+  - Episode count and metadata badges
+- [ ] Create polished "New Podcast" modal:
+  - Clean form with shadcn/ui Input and Textarea components
+  - Artwork upload with drag-and-drop preview
+  - Smooth modal animations (slide-up or fade with backdrop blur)
+- [ ] Add search bar with real-time filtering:
+  - Subtle focus states
+  - Clear icon indicator
+  - Keyboard shortcuts (Cmd+K style)
+- [ ] Display podcast statistics with elegant number formatting
+- [ ] Empty state when no podcasts exist (inspiring illustration + CTA)
 
 ### Phase 10: Frontend UI - Podcast Detail Page
-- [ ] Display podcast metadata and artwork
-- [ ] Show RSS feed URL with copy button
-- [ ] List all episodes with metadata
-- [ ] Implement drag-and-drop reordering (react-beautiful-dnd or dnd-kit)
-- [ ] Add episode controls (play preview, delete)
+- [ ] Create clean header section:
+  - Large podcast artwork with subtle border/shadow
+  - Title and description with proper typography hierarchy
+  - Metadata badges (episode count, last updated)
+  - Action buttons (Edit, Delete, Refresh) with clear iconography
+- [ ] RSS feed section:
+  - Monospaced font for URL display
+  - One-click copy button with success feedback
+  - QR code option for mobile podcast apps
+- [ ] Episode list design:
+  - Spacious list items with artwork thumbnails
+  - Clear visual hierarchy (title, metadata, duration)
+  - Smooth hover states revealing action buttons
+  - Drag handles that appear on hover (using dnd-kit)
+  - Empty state illustration when no episodes
+- [ ] Implement drag-and-drop reordering:
+  - Smooth animations during drag (opacity, scale)
+  - Visual feedback for drop zones
+  - Haptic-like spring animations on release
+  - Optimistic UI updates
+- [ ] Add episode controls:
+  - Inline audio player preview (custom or shadcn-styled)
+  - Delete with confirmation dialog
+  - Edit metadata option
 - [ ] "Add Content" section:
-  - Input for YouTube URL (video or playlist)
-  - Display processing progress
-  - Show success/error messages
+  - Prominent input field with placeholder examples
+  - URL validation with helpful error messages
+  - Elegant progress indicator during processing
+  - Success animation when complete
+  - List of pending/processing items
 
 ### Phase 11: Frontend UI - Settings
-- [ ] S3 configuration page (bucket, region, access keys)
-- [ ] CloudFront/custom domain configuration
-- [ ] User profile and password change
-- [ ] OAuth connection management
-- [ ] Polling interval configuration
-- [ ] Global settings (default audio quality, etc.)
+- [ ] Create organized settings page with sections (using shadcn/ui Tabs or Accordion)
+- [ ] S3 configuration section:
+  - Clean form layout with shadcn/ui form components
+  - Secure password-style inputs for keys
+  - Test connection button with loading state
+  - Success/error feedback
+- [ ] CloudFront/custom domain configuration:
+  - Toggle for CloudFront enablement
+  - Custom domain input with validation
+  - Helper text for DNS setup
+- [ ] User profile section:
+  - Avatar upload with preview
+  - Email and name fields
+  - Password change with current/new/confirm flow
+  - Proper validation and security feedback
+- [ ] OAuth connection management:
+  - Connected accounts list with provider badges
+  - Connect/disconnect actions with confirmation
+- [ ] Polling interval configuration:
+  - Slider or select dropdown with time presets
+  - Visual feedback for changes
+- [ ] Global settings:
+  - Audio quality selector (128/192/256/320 kbps)
+  - Theme preference (light/dark/system)
+  - Accessibility preferences
+- [ ] Save button behavior:
+  - Sticky footer or floating save button
+  - Disabled state when no changes
+  - Loading state during save
+  - Success confirmation
 
 ### Phase 12: Frontend UI - Job Monitor
 - [ ] Job queue visualization
@@ -142,13 +205,18 @@ A self-hosted Next.js application that converts YouTube videos and playlists int
 - [ ] Error logs for failed jobs
 
 ### Phase 13: Polish & Error Handling
-- [ ] Add loading states and skeletons
-- [ ] Implement toast notifications for user actions
-- [ ] Error boundary components
-- [ ] Form validation (client and server)
+- [ ] Add loading states and skeleton screens (properly styled for both themes)
+- [ ] Implement toast notifications with theme-aware colors
+- [ ] Error boundary components with elegant error displays
+- [ ] Form validation (client and server) with clear error states
 - [ ] Rate limiting for API routes
 - [ ] Input sanitization
 - [ ] Comprehensive error messages
+- [ ] Ensure all colors meet WCAG contrast requirements in both modes
+- [ ] Test all components in light and dark mode
+- [ ] Smooth theme transition animations (avoid flash of unstyled content)
+- [ ] System preference detection and automatic switching
+- [ ] Theme persistence in localStorage and user profile
 
 ### Phase 14: Docker & Deployment
 - [ ] Optimize Dockerfile (layer caching, security)
@@ -211,12 +279,49 @@ A self-hosted Next.js application that converts YouTube videos and playlists int
 - Secure password hashing (bcrypt)
 - Session management with JWT or database sessions
 
-### UI/UX
-- Beautiful, modern design (Tailwind CSS + shadcn/ui components)
-- Responsive (mobile-friendly)
-- Real-time updates for job progress
-- Intuitive workflow for adding content
-- Clear feedback for all actions
+### UI/UX Design Philosophy
+The application will embody minimalist design principles inspired by Apple's design language and best-in-class third-party Apple ecosystem apps. Think of apps like Things 3, Bear, Craft, and Raycast—polished, thoughtful, and delightful to use.
+
+**Design Framework:**
+- **Styling**: Tailwind CSS for utility-first, responsive styling
+- **Component Library**: shadcn/ui for high-quality, accessible components
+- **Theme System**: Full light and dark mode support with system preference detection
+- **Typography**: SF Pro-inspired font stack with careful hierarchy
+- **Color Palette**: Carefully curated colors optimized for both light and dark modes
+  - Light mode: Clean whites, soft grays, subtle accent colors
+  - Dark mode: True blacks or deep grays, properly contrasted elements, reduced eye strain
+  - Semantic color tokens (background, foreground, muted, accent, destructive)
+- **Spacing**: Generous whitespace, breathing room between elements
+- **Interactions**: Smooth transitions, subtle hover states, delightful micro-interactions
+
+**Key Design Principles:**
+1. **Clarity Over Density**: Prioritize readability and scanability
+2. **Purposeful Motion**: Animations should feel natural and purposeful
+3. **Content First**: UI chrome should fade into the background
+4. **Consistency**: Maintain visual rhythm across all screens
+5. **Accessibility**: WCAG 2.1 AA compliant, keyboard navigation throughout
+
+**Visual Details:**
+- Rounded corners (subtle, consistent border radius)
+- Subtle shadows and borders (avoid harsh lines)
+- Icon-forward design with high-quality SVG icons (Lucide React)
+- Empty states that guide and inspire action
+- Toast notifications that are unobtrusive yet informative
+- Loading states that feel premium (skeleton screens, smooth spinners)
+
+**Responsive Behavior:**
+- Mobile-first approach with thoughtful breakpoints
+- Touch-friendly targets (minimum 44x44px)
+- Adaptive layouts that feel native to each screen size
+- Progressive enhancement for larger screens
+
+**Component Aesthetics:**
+- Buttons: Clear hierarchy (primary, secondary, ghost, destructive)
+- Forms: Clean inputs with helpful inline validation
+- Cards: Subtle elevation, consistent padding
+- Modals/Dialogs: Centered, with backdrop blur
+- Tables/Lists: Proper density with hover states
+- Navigation: Unobtrusive sidebar or top bar with active state indicators
 
 ## Dependencies (npm packages)
 - next
@@ -230,7 +335,7 @@ A self-hosted Next.js application that converts YouTube videos and playlists int
 - bull or bullmq (job queue)
 - node-cron (scheduling)
 - zod (validation)
-- tailwindcss
+- next-themes (dark mode management)
 - @radix-ui/* or shadcn/ui components
 - react-beautiful-dnd or @dnd-kit/* (drag and drop)
 - date-fns or dayjs (date handling)
