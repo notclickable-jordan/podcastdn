@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { Cloud, Settings, Activity, LogOut, Podcast } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -48,12 +49,15 @@ export function AppHeader() {
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <form action="/api/auth/signout" method="POST">
-            <Button variant="ghost" size="icon" className="w-9 h-9 text-muted-foreground">
-              <LogOut className="w-4 h-4" />
-              <span className="sr-only">Sign out</span>
-            </Button>
-          </form>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-9 h-9 text-muted-foreground"
+            onClick={() => signOut({ callbackUrl: "/login" })}
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="sr-only">Sign out</span>
+          </Button>
         </div>
       </div>
     </header>

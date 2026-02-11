@@ -55,11 +55,13 @@ export default function RegisterPage() {
   return (
     <Card className="shadow-none sm:shadow-sm sm:border border-0">
       <CardHeader className="text-center">
-        <div className="flex justify-center items-center bg-primary mx-auto mb-4 rounded-2xl w-12 h-12 text-primary-foreground">
-          <Cloud className="w-6 h-6" />
+        <div className="flex justify-center items-center gap-3 mx-auto mb-4">
+          <div className="flex justify-center items-center bg-primary rounded-2xl w-12 h-12 text-primary-foreground">
+            <Cloud className="w-6 h-6" />
+          </div>
+          <span className="font-bold text-3xl">PodCastDN</span>
         </div>
-        <CardTitle className="text-2xl">Create account</CardTitle>
-        <CardDescription>Get started with PodCastDN</CardDescription>
+        <CardTitle className="text-gray-600 dark:text-gray-400 text-2xl">Create account</CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
