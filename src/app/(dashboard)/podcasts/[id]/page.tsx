@@ -36,7 +36,7 @@ export default async function PodcastDetailPage({
   return (
     <div className="space-y-8">
       {/* Top bar: back link + action buttons */}
-      <div className="grid grid-cols-[1fr_auto] items-center">
+      <div className="items-center grid grid-cols-[1fr_auto]">
         <Link
           href="/podcasts"
           className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm transition-colors"
