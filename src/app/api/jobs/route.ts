@@ -22,3 +22,18 @@ export async function GET(request: Request) {
 
   return NextResponse.json(jobs);
 }
+
+export async function DELETE() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const result = await prisma.job.deleteMany({
+    where: {
+      status: { in: ["completed", "failed"] },
+    },
+  });
+
+  return NextResponse.json({ deleted: result.count });
+}

@@ -15,7 +15,9 @@ import {
   Upload,
   Image,
   Search,
+  Trash2,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Job {
   id: string;
@@ -73,6 +75,7 @@ function getPhaseColor(progress: number): string {
 export function JobList() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [clearing, setClearing] = useState(false);
 
   useEffect(() => {
     async function fetchJobs() {
@@ -88,6 +91,22 @@ export function JobList() {
     const interval = setInterval(fetchJobs, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  async function clearJobs() {
+    setClearing(true);
+    try {
+      const res = await fetch("/api/jobs", { method: "DELETE" });
+      if (res.ok) {
+        setJobs((prev) => prev.filter((j) => j.status === "pending" || j.status === "processing"));
+      }
+    } finally {
+      setClearing(false);
+    }
+  }
+
+  const hasClearableJobs = jobs.some(
+    (j) => j.status === "completed" || j.status === "failed"
+  );
 
   if (loading) {
     return (
@@ -111,6 +130,23 @@ export function JobList() {
 
   return (
     <div className="space-y-2">
+      {hasClearableJobs && (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={clearJobs}
+            disabled={clearing}
+          >
+            {clearing ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
+            Clear completed
+          </Button>
+        </div>
+      )}
       {jobs.map((job) => (
         <div
           key={job.id}

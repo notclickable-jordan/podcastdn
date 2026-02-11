@@ -32,6 +32,25 @@ export const addContentSchema = z.object({
     ),
 });
 
+export const profileSchema = z.object({
+  name: z.string().min(1, "Name is required").max(200),
+  email: z.string().email("Invalid email address"),
+  currentPassword: z.string().optional(),
+  newPassword: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .optional()
+    .or(z.literal("")),
+}).refine(
+  (data) => {
+    if (data.newPassword && data.newPassword.length > 0) {
+      return !!data.currentPassword;
+    }
+    return true;
+  },
+  { message: "Current password is required to set a new password", path: ["currentPassword"] }
+);
+
 export const reorderSchema = z.object({
   episodeIds: z.array(z.string()),
 });
