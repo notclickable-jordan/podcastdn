@@ -77,11 +77,11 @@ export async function generateRssFeed(podcastId: string): Promise<string> {
             : "0:00",
         },
         { "itunes:summary": episode.description || "" },
-        ...(episode.imageUrl
+        ...((episode.imageUrl || podcast.artwork)
           ? [
               {
                 "itunes:image": {
-                  _attr: { href: episode.imageUrl },
+                  _attr: { href: episode.imageUrl || podcast.artwork },
                 },
               },
             ]
