@@ -48,10 +48,10 @@ export default function LoginPage() {
     <Card className="shadow-none sm:shadow-sm sm:border border-0">
       <CardHeader className="text-center">
         <div className="flex justify-center items-center gap-3 mx-auto mb-4">
-          <div className="flex justify-center items-center bg-primary rounded-2xl w-12 h-12 text-primary-foreground shadow-lg shadow-primary/25">
+          <div className="flex justify-center items-center bg-primary shadow-lg shadow-primary/25 rounded-2xl w-12 h-12 text-primary-foreground">
             <Cloud className="w-6 h-6" />
           </div>
-          <span className="font-bold text-3xl bg-linear-to-r from-primary to-purple-400 bg-clip-text text-transparent">PodCastDN</span>
+          <span className="bg-clip-text bg-linear-to-r from-primary to-purple-400 font-bold text-transparent text-3xl">PodCastDN</span>
         </div>
         <CardTitle className="text-gray-600 dark:text-gray-400 text-2xl">Welcome back</CardTitle>
       </CardHeader>
@@ -92,7 +92,7 @@ export default function LoginPage() {
             Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="text-primary hover:text-primary/80 underline underline-offset-4 font-medium"
+              className="font-medium text-primary hover:text-primary/80 underline underline-offset-4"
             >
               Sign up
             </Link>

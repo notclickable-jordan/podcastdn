@@ -18,7 +18,7 @@ export function AppHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="top-0 z-40 sticky bg-primary backdrop-blur-xl shadow-md">
+    <header className="top-0 z-40 sticky bg-primary shadow-md backdrop-blur-xl">
       <div className="flex justify-between items-center mx-auto px-4 max-w-5xl h-14">
         <div className="flex items-center gap-6">
           <Link
@@ -35,7 +35,7 @@ export function AppHeader() {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "gap-2 text-primary-foreground/70 hover:bg-white/15 hover:text-primary-foreground",
+                    "gap-2 hover:bg-white/15 text-primary-foreground/70 hover:text-primary-foreground",
                     pathname.startsWith(item.href) &&
                       "text-primary-foreground bg-white/20 hover:bg-white/25"
                   )}
@@ -52,7 +52,7 @@ export function AppHeader() {
           <Button
             variant="ghost"
             size="icon"
-            className="w-9 h-9 text-primary-foreground/70 hover:bg-white/15 hover:text-primary-foreground"
+            className="hover:bg-white/15 w-9 h-9 text-primary-foreground/70 hover:text-primary-foreground"
             onClick={() => signOut({ callbackUrl: "/login" })}
           >
             <LogOut className="w-4 h-4" />

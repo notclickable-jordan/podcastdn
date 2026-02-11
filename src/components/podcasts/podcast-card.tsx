@@ -17,16 +17,16 @@ interface PodcastCardProps {
 export function PodcastCard({ podcast }: PodcastCardProps) {
   return (
     <Link href={`/podcasts/${podcast.id}`}>
-      <Card className="group relative flex items-center gap-4 p-4 hover:shadow-md hover:bg-accent/50 transition-all duration-200 cursor-pointer border-l-4 border-l-transparent hover:border-l-primary">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary/10 overflow-hidden">
+      <Card className="group relative flex items-center gap-4 hover:bg-accent/50 hover:shadow-md p-4 border-l-4 border-l-transparent hover:border-l-primary transition-all duration-200 cursor-pointer">
+        <div className="flex justify-center items-center bg-primary/10 rounded-xl w-16 h-16 overflow-hidden shrink-0">
           {podcast.artwork ? (
             <img
               src={podcast.artwork}
               alt={podcast.title}
-              className="h-full w-full object-cover"
+              className="w-full h-full object-cover"
             />
           ) : (
-            <PodcastIcon className="h-7 w-7 text-primary" />
+            <PodcastIcon className="w-7 h-7 text-primary" />
           )}
         </div>
         <div className="flex-1 min-w-0">
@@ -34,13 +34,13 @@ export function PodcastCard({ podcast }: PodcastCardProps) {
             {podcast.title}
           </h3>
           {podcast.description && (
-            <p className="text-sm text-muted-foreground line-clamp-1 mt-0.5">
+            <p className="mt-0.5 text-muted-foreground text-sm line-clamp-1">
               {podcast.description}
             </p>
           )}
-          <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
+          <div className="flex items-center gap-3 mt-1.5 text-muted-foreground text-xs">
             <span className="flex items-center gap-1">
-              <Music className="h-3 w-3" />
+              <Music className="w-3 h-3" />
               {podcast._count.episodes} episode
               {podcast._count.episodes !== 1 ? "s" : ""}
             </span>
@@ -52,7 +52,7 @@ export function PodcastCard({ podcast }: PodcastCardProps) {
             </span>
           </div>
         </div>
-        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+        <ChevronRight className="opacity-0 group-hover:opacity-100 w-4 h-4 text-muted-foreground transition-opacity" />
       </Card>
     </Link>
   );
