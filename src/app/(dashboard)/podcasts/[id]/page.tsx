@@ -7,6 +7,7 @@ import { EpisodeList } from "@/components/episodes/episode-list";
 import { AddContentForm } from "@/components/episodes/add-content-form";
 import { CopyButton } from "@/components/podcasts/copy-button";
 import { PublishRssButton } from "@/components/podcasts/publish-rss-button";
+import { ExportPodcastButton } from "@/components/podcasts/export-podcast-button";
 import { EditPodcastForm } from "@/components/podcasts/edit-podcast-form";
 import { getRssFeedUrl } from "@/lib/services/rss";
 
@@ -34,14 +35,20 @@ export default async function PodcastDetailPage({
 
   return (
     <div className="space-y-8">
-      {/* Back navigation */}
-      <Link
-        href="/podcasts"
-        className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to podcasts
-      </Link>
+      {/* Top bar: back link + action buttons */}
+      <div className="grid grid-cols-[1fr_auto] items-center">
+        <Link
+          href="/podcasts"
+          className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to podcasts
+        </Link>
+        <div className="flex items-center gap-2">
+          <PublishRssButton podcastId={podcast.id} />
+          <ExportPodcastButton podcastId={podcast.id} />
+        </div>
+      </div>
 
       {/* Two-column header: info left, actions right */}
       <div className="flex lg:flex-row flex-col lg:items-start gap-6">
@@ -65,7 +72,6 @@ export default async function PodcastDetailPage({
               {rssUrl}
             </code>
             <CopyButton text={rssUrl} />
-            <PublishRssButton podcastId={podcast.id} />
           </div>
 
           {/* Add Content */}

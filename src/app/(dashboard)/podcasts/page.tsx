@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Podcast, Search } from "lucide-react";
 import { PodcastCard } from "@/components/podcasts/podcast-card";
 import { CreatePodcastDialog } from "@/components/podcasts/create-podcast-dialog";
+import { ImportPodcastDialog } from "@/components/podcasts/import-podcast-dialog";
 
 export default async function PodcastsPage() {
   const session = await auth();
@@ -17,30 +18,33 @@ export default async function PodcastsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Podcasts</h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <h1 className="font-bold text-2xl tracking-tight">Podcasts</h1>
+          <p className="mt-1 text-muted-foreground text-sm">
             Manage your podcast feeds
           </p>
         </div>
-        <CreatePodcastDialog />
+        <div className="flex items-center gap-2">
+          <ImportPodcastDialog />
+          <CreatePodcastDialog />
+        </div>
       </div>
 
       {podcasts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-16 px-4">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted mb-4">
-            <Podcast className="h-8 w-8 text-muted-foreground" />
+        <div className="flex flex-col justify-center items-center px-4 py-16 border border-dashed rounded-2xl">
+          <div className="flex justify-center items-center bg-muted mb-4 rounded-2xl w-16 h-16">
+            <Podcast className="w-8 h-8 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-semibold">No podcasts yet</h3>
-          <p className="text-sm text-muted-foreground mt-1 mb-4 text-center max-w-sm">
+          <h3 className="font-semibold text-lg">No podcasts yet</h3>
+          <p className="mt-1 mb-4 max-w-sm text-muted-foreground text-sm text-center">
             Create your first podcast to start converting YouTube videos into
             podcast episodes.
           </p>
           <CreatePodcastDialog />
         </div>
       ) : (
-        <div className="grid gap-3">
+        <div className="gap-3 grid">
           {podcasts.map((podcast) => (
             <PodcastCard key={podcast.id} podcast={podcast} />
           ))}
