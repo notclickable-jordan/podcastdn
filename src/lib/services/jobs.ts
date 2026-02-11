@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { youtube } from "@/lib/services/youtube";
 import { s3 } from "@/lib/services/s3";
 import { publishRssFeed } from "@/lib/services/rss";
+import path from "path";
 import fs from "fs/promises";
 
 // Throttle job progress updates to avoid overwhelming the database
@@ -52,6 +53,11 @@ function formatBytes(bytes: number): string {
 
 export async function processVideoJob(jobId: string) {
   console.log(`[job:${jobId}] Starting video download job`);
+
+  // Track temp directories for cleanup
+  let audioTmpDir: string | null = null;
+  let thumbTmpDir: string | null = null;
+
   const job = await prisma.job.update({
     where: { id: jobId },
     data: { status: "processing", startedAt: new Date(), progress: 0, message: "Starting…" },
@@ -104,6 +110,7 @@ export async function processVideoJob(jobId: string) {
         }
       }
     );
+    audioTmpDir = path.dirname(filePath);
     console.log(`[job:${jobId}] Audio downloaded in ${((Date.now() - startDownload) / 1000).toFixed(1)}s (${(fileSize / 1024 / 1024).toFixed(1)} MB)`);
 
     await progressUpdater.flush();
@@ -134,6 +141,7 @@ export async function processVideoJob(jobId: string) {
     try {
       console.log(`[job:${jobId}] Downloading thumbnail...`);
       const thumbPath = await youtube.downloadThumbnail(metadata.videoId);
+      thumbTmpDir = path.dirname(thumbPath);
       progressUpdater.update(93, "Uploading thumbnail…");
       imageUrl = await s3.uploadArtwork(
         thumbPath,
@@ -141,7 +149,6 @@ export async function processVideoJob(jobId: string) {
         metadata.episodeId
       );
       console.log(`[job:${jobId}] Thumbnail uploaded: ${imageUrl}`);
-      await fs.rm(thumbPath, { recursive: true, force: true }).catch(() => {});
     } catch (error) {
       console.warn(`[job:${jobId}] Thumbnail failed (non-fatal):`, error instanceof Error ? error.message : error);
     }
@@ -159,9 +166,6 @@ export async function processVideoJob(jobId: string) {
         fileSize,
       },
     });
-
-    // Cleanup temp file
-    await fs.rm(filePath, { recursive: true, force: true }).catch(() => {});
 
     await progressUpdater.flush();
 
@@ -193,6 +197,14 @@ export async function processVideoJob(jobId: string) {
       },
     });
     throw error;
+  } finally {
+    // Clean up all temp directories regardless of success or failure
+    if (audioTmpDir) {
+      await fs.rm(audioTmpDir, { recursive: true, force: true }).catch(() => {});
+    }
+    if (thumbTmpDir) {
+      await fs.rm(thumbTmpDir, { recursive: true, force: true }).catch(() => {});
+    }
   }
 }
 

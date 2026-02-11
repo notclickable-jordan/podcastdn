@@ -109,6 +109,7 @@ async function downloadAudio(
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "podcast-"));
   const outputPath = path.join(tmpDir, `${videoId}.mp3`);
 
+  try {
   await new Promise<void>((resolve, reject) => {
     const proc = spawn("yt-dlp", [
       "-x",
@@ -200,37 +201,48 @@ async function downloadAudio(
     duration,
     fileSize: stats.size,
   };
+  } catch (error) {
+    // Clean up temp directory on failure
+    await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
+    throw error;
+  }
 }
 
 async function downloadThumbnail(videoId: string): Promise<string> {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "podcast-thumb-"));
   const outputPath = path.join(tmpDir, `${videoId}.jpg`);
 
-  await exec(
-    "yt-dlp",
-    [
-      "--write-thumbnail",
-      "--skip-download",
-      "--convert-thumbnails",
-      "jpg",
-      "-o",
-      path.join(tmpDir, videoId),
-      `https://www.youtube.com/watch?v=${videoId}`,
-    ],
-    { timeout: 60_000 }
-  );
+  try {
+    await exec(
+      "yt-dlp",
+      [
+        "--write-thumbnail",
+        "--skip-download",
+        "--convert-thumbnails",
+        "jpg",
+        "-o",
+        path.join(tmpDir, videoId),
+        `https://www.youtube.com/watch?v=${videoId}`,
+      ],
+      { timeout: 60_000 }
+    );
 
-  // yt-dlp may produce the file with different extensions
-  const files = await fs.readdir(tmpDir);
-  const thumbFile = files.find(
-    (f) => f.endsWith(".jpg") || f.endsWith(".webp") || f.endsWith(".png")
-  );
+    // yt-dlp may produce the file with different extensions
+    const files = await fs.readdir(tmpDir);
+    const thumbFile = files.find(
+      (f) => f.endsWith(".jpg") || f.endsWith(".webp") || f.endsWith(".png")
+    );
 
-  if (thumbFile) {
-    return path.join(tmpDir, thumbFile);
+    if (thumbFile) {
+      return path.join(tmpDir, thumbFile);
+    }
+
+    return outputPath;
+  } catch (error) {
+    // Clean up temp directory on failure
+    await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
+    throw error;
   }
-
-  return outputPath;
 }
 
 export const youtube = {
