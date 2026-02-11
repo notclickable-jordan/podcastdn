@@ -17,8 +17,8 @@ interface PodcastCardProps {
 export function PodcastCard({ podcast }: PodcastCardProps) {
   return (
     <Link href={`/podcasts/${podcast.id}`}>
-      <Card className="group relative flex items-center gap-4 p-4 hover:shadow-md hover:bg-accent/50 transition-all duration-200 cursor-pointer">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-muted overflow-hidden">
+      <Card className="group relative flex items-center gap-4 p-4 hover:shadow-md hover:bg-accent/50 transition-all duration-200 cursor-pointer border-l-4 border-l-transparent hover:border-l-primary">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary/10 overflow-hidden">
           {podcast.artwork ? (
             <img
               src={podcast.artwork}
@@ -26,7 +26,7 @@ export function PodcastCard({ podcast }: PodcastCardProps) {
               className="h-full w-full object-cover"
             />
           ) : (
-            <PodcastIcon className="h-7 w-7 text-muted-foreground" />
+            <PodcastIcon className="h-7 w-7 text-primary" />
           )}
         </div>
         <div className="flex-1 min-w-0">

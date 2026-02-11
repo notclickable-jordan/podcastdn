@@ -56,10 +56,10 @@ export default function RegisterPage() {
     <Card className="shadow-none sm:shadow-sm sm:border border-0">
       <CardHeader className="text-center">
         <div className="flex justify-center items-center gap-3 mx-auto mb-4">
-          <div className="flex justify-center items-center bg-primary rounded-2xl w-12 h-12 text-primary-foreground">
+          <div className="flex justify-center items-center bg-primary rounded-2xl w-12 h-12 text-primary-foreground shadow-lg shadow-primary/25">
             <Cloud className="w-6 h-6" />
           </div>
-          <span className="font-bold text-3xl">PodCastDN</span>
+          <span className="font-bold text-3xl bg-linear-to-r from-primary to-purple-400 bg-clip-text text-transparent">PodCastDN</span>
         </div>
         <CardTitle className="text-gray-600 dark:text-gray-400 text-2xl">Create account</CardTitle>
       </CardHeader>
@@ -110,7 +110,7 @@ export default function RegisterPage() {
             Already have an account?{" "}
             <Link
               href="/login"
-              className="text-foreground hover:text-primary underline underline-offset-4"
+              className="text-primary hover:text-primary/80 underline underline-offset-4 font-medium"
             >
               Sign in
             </Link>

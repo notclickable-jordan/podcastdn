@@ -33,8 +33,8 @@ export default async function PodcastsPage() {
 
       {podcasts.length === 0 ? (
         <div className="flex flex-col justify-center items-center px-4 py-16 border border-dashed rounded-2xl">
-          <div className="flex justify-center items-center bg-muted mb-4 rounded-2xl w-16 h-16">
-            <Podcast className="w-8 h-8 text-muted-foreground" />
+          <div className="flex justify-center items-center bg-primary/10 mb-4 rounded-2xl w-16 h-16">
+            <Podcast className="w-8 h-8 text-primary" />
           </div>
           <h3 className="font-semibold text-lg">No podcasts yet</h3>
           <p className="mt-1 mb-4 max-w-sm text-muted-foreground text-sm text-center">
