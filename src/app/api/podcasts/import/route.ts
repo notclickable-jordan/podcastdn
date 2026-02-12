@@ -27,7 +27,6 @@ const importSchema = z.object({
       duration: z.number().nullable().optional(),
       fileSize: z.number().nullable().optional(),
       youtubeId: z.string().nullable().optional(),
-      order: z.number().default(0),
     })
   ),
   sources: z
@@ -90,7 +89,6 @@ export async function POST(request: Request) {
             duration: ep.duration ?? null,
             fileSize: ep.fileSize ?? null,
             youtubeId: ep.youtubeId ?? null,
-            order: ep.order,
           })),
         },
         sources: {

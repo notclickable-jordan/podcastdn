@@ -42,7 +42,7 @@ A self-hosted Next.js application that converts YouTube videos and playlists int
 - [ ] Design and implement Prisma schema:
   - User model (id, email, password, oauth provider/id)
   - Podcast model (id, title, description, artwork, settings, userId)
-  - Episode model (id, title, description, audioUrl, imageUrl, duration, order, podcastId)
+  - Episode model (id, title, description, audioUrl, imageUrl, duration, podcastId)
   - Source model (id, type [video/playlist], youtubeId, lastChecked, podcastId)
   - Job model (id, type, status, progress, metadata)
 - [ ] Create Prisma migrations
@@ -250,7 +250,6 @@ A self-hosted Next.js application that converts YouTube videos and playlists int
 ## Technical Considerations
 
 ### Database Schema Notes
-- Episodes should have an `order` field for manual reordering
 - Sources track `lastChecked` timestamp for polling
 - Jobs track progress percentage and status (pending/processing/completed/failed)
 - Support soft deletes for podcasts/episodes

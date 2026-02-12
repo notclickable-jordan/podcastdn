@@ -81,7 +81,6 @@ CREATE TABLE "Episode" (
     "duration" INTEGER,
     "fileSize" INTEGER,
     "youtubeId" TEXT,
-    "order" INTEGER NOT NULL DEFAULT 0,
     "podcastId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
