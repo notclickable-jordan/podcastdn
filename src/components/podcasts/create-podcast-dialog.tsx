@@ -112,7 +112,7 @@ export function CreatePodcastDialog() {
       setCustomFolder(false);
       setFolderName("");
       clearArtwork();
-      router.refresh();
+      router.push(`/podcasts/${podcast.id}`);
     } catch (error) {
       toast({
         title: error instanceof Error ? error.message : "Failed to create podcast",
