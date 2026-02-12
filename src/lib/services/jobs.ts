@@ -233,9 +233,11 @@ export async function processPlaylistScan(jobId: string) {
   const metadata = job.metadata as {
     playlistId: string;
     podcastId: string;
+    limit?: number;
+    skip?: number;
   };
 
-  console.log(`[job:${jobId}] Playlist: ${metadata.playlistId}, Podcast: ${metadata.podcastId}`);
+  console.log(`[job:${jobId}] Playlist: ${metadata.playlistId}, Podcast: ${metadata.podcastId}, limit: ${metadata.limit ?? 'all'}, skip: ${metadata.skip ?? 0}`);
 
   try {
     await prisma.job.update({
@@ -247,6 +249,17 @@ export async function processPlaylistScan(jobId: string) {
     const playlist = await youtube.getPlaylistMetadata(metadata.playlistId);
     console.log(`[job:${jobId}] Playlist has ${playlist.entries.length} total video(s)`);
 
+    // Apply skip and limit to playlist entries
+    let entries = playlist.entries;
+    if (metadata.skip && metadata.skip > 0) {
+      entries = entries.slice(metadata.skip);
+      console.log(`[job:${jobId}] Skipped first ${metadata.skip} video(s), ${entries.length} remaining`);
+    }
+    if (metadata.limit && metadata.limit > 0) {
+      entries = entries.slice(0, metadata.limit);
+      console.log(`[job:${jobId}] Limited to ${metadata.limit} video(s), processing ${entries.length}`);
+    }
+
     // Get existing episodes in this podcast
     const existingEpisodes = await prisma.episode.findMany({
       where: { podcastId: metadata.podcastId },
@@ -255,7 +268,7 @@ export async function processPlaylistScan(jobId: string) {
     const existingIds = new Set(existingEpisodes.map((e) => e.youtubeId));
 
     // Find new videos
-    const newVideos = playlist.entries.filter(
+    const newVideos = entries.filter(
       (v) => !existingIds.has(v.id)
     );
     console.log(`[job:${jobId}] Found ${newVideos.length} new video(s) (${existingIds.size} already exist)`);

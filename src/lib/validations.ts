@@ -33,7 +33,9 @@ export const podcastSchema = z.object({
 export const addContentSchema = z.object({
   url: z
     .string()
-    .url("Invalid URL")
+    .url("Invalid URL"),
+  limit: z.number().int().min(1).optional(),
+  skip: z.number().int().min(0).optional(),
 });
 
 export const episodeSchema = z.object({
