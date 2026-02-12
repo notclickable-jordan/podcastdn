@@ -6,6 +6,7 @@ import { Trash2, Music, Clock, Calendar, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
 import { formatDuration } from "@/lib/utils";
+import { EditEpisodeDialog } from "@/components/episodes/edit-episode-dialog";
 
 interface Episode {
   id: string;
@@ -14,15 +15,18 @@ interface Episode {
   audioUrl: string | null;
   imageUrl: string | null;
   duration: number | null;
+  sourceUrl?: string | null;
   createdAt: string;
 }
 
 function EpisodeRow({
   episode,
   onDelete,
+  onClick,
 }: {
   episode: Episode;
   onDelete: (id: string) => void;
+  onClick: () => void;
 }) {
   const isProcessing = !episode.audioUrl;
 
@@ -36,7 +40,18 @@ function EpisodeRow({
   );
 
   return (
-    <div className="group flex items-center gap-3 bg-card hover:bg-accent/50 p-3 border rounded-xl transition-all duration-200">
+    <div
+      className="group flex items-center gap-3 bg-card hover:bg-accent/50 p-3 border rounded-xl transition-all duration-200 cursor-pointer"
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+    >
       <div className="flex justify-center items-center bg-muted rounded-lg w-10 h-10 overflow-hidden shrink-0">
         {episode.imageUrl ? (
           <img
@@ -74,7 +89,10 @@ function EpisodeRow({
         variant="ghost"
         size="icon"
         className="opacity-0 group-hover:opacity-100 w-8 h-8 text-muted-foreground hover:text-destructive transition-opacity"
-        onClick={() => onDelete(episode.id)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onDelete(episode.id);
+        }}
       >
         <Trash2 className="w-3.5 h-3.5" />
       </Button>
@@ -92,6 +110,7 @@ export function EpisodeList({
   const router = useRouter();
   const { toast } = useToast();
   const [episodes, setEpisodes] = useState(initialEpisodes);
+  const [editingEpisode, setEditingEpisode] = useState<Episode | null>(null);
 
   async function handleDelete(episodeId: string) {
     try {
@@ -107,6 +126,12 @@ export function EpisodeList({
     } catch {
       toast({ title: "Failed to delete episode", variant: "destructive" });
     }
+  }
+
+  function handleEpisodeUpdated(updated: Episode) {
+    setEpisodes((prev) =>
+      prev.map((e) => (e.id === updated.id ? updated : e))
+    );
   }
 
   if (episodes.length === 0) {
@@ -127,8 +152,21 @@ export function EpisodeList({
           key={episode.id}
           episode={episode}
           onDelete={handleDelete}
+          onClick={() => setEditingEpisode(episode)}
         />
       ))}
+
+      {editingEpisode && (
+        <EditEpisodeDialog
+          episode={editingEpisode}
+          podcastId={podcastId}
+          open={!!editingEpisode}
+          onOpenChange={(open) => {
+            if (!open) setEditingEpisode(null);
+          }}
+          onUpdated={handleEpisodeUpdated}
+        />
+      )}
     </div>
   );
 }

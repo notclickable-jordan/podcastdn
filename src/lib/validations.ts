@@ -27,6 +27,14 @@ export const addContentSchema = z.object({
     .url("Invalid URL")
 });
 
+export const episodeSchema = z.object({
+  title: z.string().min(1, "Title is required").max(500),
+  description: z.string().max(10000).optional().or(z.literal("")),
+  imageUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  sourceUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  createdAt: z.string().datetime({ offset: true }).optional(),
+});
+
 export const profileSchema = z.object({
   name: z.string().min(1, "Name is required").max(200),
   email: z.string().email("Invalid email address"),
