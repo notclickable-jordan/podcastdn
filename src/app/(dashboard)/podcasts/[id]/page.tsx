@@ -31,7 +31,7 @@ export default async function PodcastDetailPage({
 
   if (!podcast) notFound();
 
-  const rssUrl = getRssFeedUrl(podcast.id);
+  const rssUrl = await getRssFeedUrl(podcast.id);
 
   return (
     <div className="space-y-8">

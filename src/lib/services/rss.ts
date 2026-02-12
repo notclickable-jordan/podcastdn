@@ -16,7 +16,8 @@ export async function generateRssFeed(podcastId: string): Promise<string> {
 
   if (!podcast) throw new Error("Podcast not found");
 
-  const feedUrl = getRssFeedUrl(podcastId);
+  const folder = podcast.s3FolderName || podcastId;
+  const feedUrl = s3.getPublicUrl(getRssFeedKey(folder));
   const siteUrl = getPublicBaseUrl();
 
   const feed = new RSS({
@@ -121,24 +122,38 @@ function stripCdata(xml: string): string {
   return xml.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, (_, content) => escapeXml(content));
 }
 
-function getRssFeedKey(podcastId: string): string {
-  return `${podcastId}/feed.xml`;
+function getRssFeedKey(folderName: string): string {
+  return `${folderName}/feed.xml`;
 }
 
-export function getRssFeedUrl(podcastId: string): string {
-  return s3.getPublicUrl(getRssFeedKey(podcastId));
+/**
+ * Resolve the S3 folder name for a podcast. Falls back to the podcast ID.
+ */
+async function resolveFolder(podcastId: string): Promise<string> {
+  const podcast = await prisma.podcast.findUnique({
+    where: { id: podcastId },
+    select: { s3FolderName: true },
+  });
+  return podcast?.s3FolderName || podcastId;
+}
+
+export async function getRssFeedUrl(podcastId: string): Promise<string> {
+  const folder = await resolveFolder(podcastId);
+  return s3.getPublicUrl(getRssFeedKey(folder));
 }
 
 export async function publishRssFeed(podcastId: string): Promise<string> {
+  const folder = await resolveFolder(podcastId);
   const xml = await generateRssFeed(podcastId);
-  const key = getRssFeedKey(podcastId);
+  const key = getRssFeedKey(folder);
   const url = await s3.uploadContent(xml, key, "application/rss+xml; charset=utf-8");
   await s3.invalidateCloudFront([key]).catch(() => {});
   return url;
 }
 
 export async function deleteRssFeed(podcastId: string): Promise<void> {
-  const key = getRssFeedKey(podcastId);
+  const folder = await resolveFolder(podcastId);
+  const key = getRssFeedKey(folder);
   await s3.deleteFile(key).catch(() => {});
   await s3.invalidateCloudFront([key]).catch(() => {});
 }

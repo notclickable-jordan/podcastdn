@@ -16,6 +16,7 @@ const importSchema = z.object({
     language: z.string().default("en"),
     category: z.string().nullable().optional(),
     explicit: z.boolean().default(false),
+    s3FolderName: z.string().nullable().optional(),
   }),
   episodes: z.array(
     z.object({
@@ -78,6 +79,7 @@ export async function POST(request: Request) {
         language: data.podcast.language,
         category: data.podcast.category ?? null,
         explicit: data.podcast.explicit,
+        s3FolderName: data.podcast.s3FolderName ?? null,
         userId: session.user.id,
         episodes: {
           create: data.episodes.map((ep) => ({

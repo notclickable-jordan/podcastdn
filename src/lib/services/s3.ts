@@ -72,17 +72,17 @@ async function uploadFile(
 
 async function uploadAudio(
   filePath: string,
-  podcastId: string,
+  folderName: string,
   episodeId: string,
   onProgress?: UploadProgressCallback
 ): Promise<string> {
-  const key = `${podcastId}/episodes/${episodeId}/audio.mp3`;
+  const key = `${folderName}/episodes/${episodeId}/audio.mp3`;
   return uploadFile(filePath, key, "audio/mpeg", onProgress);
 }
 
 async function uploadArtwork(
   filePath: string,
-  podcastId: string,
+  folderName: string,
   episodeId?: string,
   onProgress?: UploadProgressCallback
 ): Promise<string> {
@@ -91,8 +91,8 @@ async function uploadArtwork(
     ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
 
   const key = episodeId
-    ? `${podcastId}/episodes/${episodeId}/artwork${ext}`
-    : `${podcastId}/artwork${ext}`;
+    ? `${folderName}/episodes/${episodeId}/artwork${ext}`
+    : `${folderName}/artwork${ext}`;
 
   return uploadFile(filePath, key, contentType, onProgress);
 }

@@ -52,6 +52,17 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+/**
+ * Resolve the S3 folder name for a podcast. Falls back to the podcast ID.
+ */
+async function resolveS3Folder(podcastId: string): Promise<string> {
+  const podcast = await prisma.podcast.findUnique({
+    where: { id: podcastId },
+    select: { s3FolderName: true },
+  });
+  return podcast?.s3FolderName || podcastId;
+}
+
 export async function processVideoJob(jobId: string) {
   console.log(`[job:${jobId}] Starting video download job`);
 
@@ -75,6 +86,9 @@ export async function processVideoJob(jobId: string) {
   console.log(`[job:${jobId}] Video: ${metadata.videoId}, Episode: ${metadata.episodeId}`);
 
   try {
+    // Resolve the S3 folder name for this podcast
+    const s3Folder = await resolveS3Folder(metadata.podcastId);
+
     // Phase 1: Fetch video metadata (0–5%)
     progressUpdater.update(2, "Fetching video metadata…");
 
@@ -121,7 +135,7 @@ export async function processVideoJob(jobId: string) {
     console.log(`[job:${jobId}] Uploading audio to S3...`);
     const audioUrl = await s3.uploadAudio(
       filePath,
-      metadata.podcastId,
+      s3Folder,
       metadata.episodeId,
       (pct, loaded, total) => {
         const jobPct = Math.round(60 + (pct / 100) * 30);
@@ -146,7 +160,7 @@ export async function processVideoJob(jobId: string) {
       progressUpdater.update(93, "Uploading thumbnail…");
       imageUrl = await s3.uploadArtwork(
         thumbPath,
-        metadata.podcastId,
+        s3Folder,
         metadata.episodeId
       );
       console.log(`[job:${jobId}] Thumbnail uploaded: ${imageUrl}`);
@@ -407,6 +421,9 @@ export async function processUrlDownloadJob(jobId: string) {
   console.log(`[job:${jobId}] URL: ${metadata.url}, Episode: ${metadata.episodeId}`);
 
   try {
+    // Resolve the S3 folder name for this podcast
+    const s3Folder = await resolveS3Folder(metadata.podcastId);
+
     // Phase 1: Download file (0–40%)
     progressUpdater.update(5, "Downloading file…");
 
@@ -450,7 +467,7 @@ export async function processUrlDownloadJob(jobId: string) {
     console.log(`[job:${jobId}] Uploading audio to S3...`);
     const audioUrl = await s3.uploadAudio(
       mp3Path,
-      metadata.podcastId,
+      s3Folder,
       metadata.episodeId,
       (pct, loaded, total) => {
         const jobPct = Math.round(72 + (pct / 100) * 23);
@@ -531,6 +548,9 @@ export async function processUploadJob(jobId: string) {
   console.log(`[job:${jobId}] File: ${metadata.originalFilename}, Episode: ${metadata.episodeId}`);
 
   try {
+    // Resolve the S3 folder name for this podcast
+    const s3Folder = await resolveS3Folder(metadata.podcastId);
+
     // Validate the file exists and is a valid media file
     if (!media.isValidMediaFile(metadata.originalFilename)) {
       // Delete the invalid uploaded file
@@ -570,7 +590,7 @@ export async function processUploadJob(jobId: string) {
     console.log(`[job:${jobId}] Uploading audio to S3...`);
     const audioUrl = await s3.uploadAudio(
       mp3Path,
-      metadata.podcastId,
+      s3Folder,
       metadata.episodeId,
       (pct, loaded, total) => {
         const jobPct = Math.round(52 + (pct / 100) * 43);

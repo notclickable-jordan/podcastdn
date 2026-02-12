@@ -52,7 +52,7 @@ export async function PUT(
 
   try {
     const body = await request.json();
-    const data = podcastSchema.partial().parse(body);
+    const { s3FolderName: _ignored, ...data } = podcastSchema.partial().parse(body);
 
     const podcast = await prisma.podcast.update({
       where: { id },

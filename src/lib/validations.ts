@@ -19,6 +19,15 @@ export const podcastSchema = z.object({
   language: z.string().default("en"),
   category: z.string().optional(),
   explicit: z.boolean().default(false),
+  s3FolderName: z
+    .string()
+    .min(1, "Folder name is required")
+    .max(100)
+    .regex(
+      /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/,
+      "Folder name must start with a letter or number and contain only letters, numbers, hyphens, and underscores"
+    )
+    .optional(),
 });
 
 export const addContentSchema = z.object({
