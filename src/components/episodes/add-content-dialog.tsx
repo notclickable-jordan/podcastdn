@@ -171,6 +171,7 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
                     placeholder="https://…"
                     className="pl-9"
                     disabled={loading}
+                    autoFocus
                   />
                 </div>
               </div>
