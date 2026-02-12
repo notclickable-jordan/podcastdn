@@ -8,6 +8,7 @@ import { AddContentDialog } from "@/components/episodes/add-content-dialog";
 import { CopyButton } from "@/components/podcasts/copy-button";
 import { PublishRssButton } from "@/components/podcasts/publish-rss-button";
 import { ExportPodcastButton } from "@/components/podcasts/export-podcast-button";
+import { DeletePodcastDialog } from "@/components/podcasts/delete-podcast-dialog";
 import { EditPodcastForm } from "@/components/podcasts/edit-podcast-form";
 import { getRssFeedUrl } from "@/lib/services/rss";
 
@@ -48,6 +49,7 @@ export default async function PodcastDetailPage({
           <AddContentDialog podcastId={podcast.id} />
           <ExportPodcastButton podcastId={podcast.id} />
           <PublishRssButton podcastId={podcast.id} />
+          <DeletePodcastDialog podcastId={podcast.id} podcastTitle={podcast.title} />
         </div>
       </div>
 

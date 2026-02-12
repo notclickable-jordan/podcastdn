@@ -2,6 +2,8 @@ import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
 import {
   CloudFrontClient,
@@ -124,6 +126,39 @@ async function deleteFile(key: string): Promise<void> {
   );
 }
 
+async function deleteFolder(prefix: string): Promise<void> {
+  const client = getS3Client();
+  const bucket = getBucketName();
+
+  let continuationToken: string | undefined;
+  do {
+    const list = await client.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix.endsWith("/") ? prefix : `${prefix}/`,
+        ContinuationToken: continuationToken,
+      })
+    );
+
+    const objects = list.Contents;
+    if (objects && objects.length > 0) {
+      await client.send(
+        new DeleteObjectsCommand({
+          Bucket: bucket,
+          Delete: {
+            Objects: objects.map((o) => ({ Key: o.Key! })),
+            Quiet: true,
+          },
+        })
+      );
+    }
+
+    continuationToken = list.IsTruncated
+      ? list.NextContinuationToken
+      : undefined;
+  } while (continuationToken);
+}
+
 async function invalidateCloudFront(paths: string[]): Promise<void> {
   const distributionId = process.env.CLOUDFRONT_DISTRIBUTION_ID;
   if (!distributionId) return;
@@ -156,6 +191,7 @@ export const s3 = {
   uploadFile,
   uploadContent,
   deleteFile,
+  deleteFolder,
   getPublicUrl,
   invalidateCloudFront,
 };
