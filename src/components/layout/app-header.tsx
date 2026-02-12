@@ -18,12 +18,12 @@ export function AppHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="top-0 z-40 sticky bg-primary shadow-md backdrop-blur-xl">
+    <header className="top-0 z-40 sticky bg-[oklch(0.5_0.24_295)] shadow-md backdrop-blur-xl">
       <div className="flex justify-between items-center mx-auto px-4 max-w-5xl h-14">
         <div className="flex items-center gap-6">
           <Link
             href="/podcasts"
-            className="flex items-center gap-2 hover:opacity-80 font-semibold text-primary-foreground transition-opacity"
+            className="flex items-center gap-2 hover:opacity-80 font-semibold text-white transition-opacity"
           >
             <Cloud className="w-5 h-5" />
             <span className="hidden sm:inline">PodCastDN</span>
@@ -35,9 +35,9 @@ export function AppHeader() {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "gap-2 hover:bg-white/15 text-primary-foreground/70 hover:text-primary-foreground",
+                    "gap-2 hover:bg-white/15 text-white/70 hover:text-white",
                     pathname.startsWith(item.href) &&
-                      "text-primary-foreground bg-white/20 hover:bg-white/25"
+                      "text-white bg-white/20 hover:bg-white/25"
                   )}
                 >
                   <item.icon className="w-4 h-4" />
@@ -52,7 +52,7 @@ export function AppHeader() {
           <Button
             variant="ghost"
             size="icon"
-            className="hover:bg-white/15 w-9 h-9 text-primary-foreground/70 hover:text-primary-foreground"
+            className="hover:bg-white/15 w-9 h-9 text-white/70 hover:text-white"
             onClick={() => signOut({ callbackUrl: "/login" })}
           >
             <LogOut className="w-4 h-4" />
