@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "PodCastDN",
-  description: "Convert YouTube videos and playlists into podcast RSS feeds",
+  description: "Convert videos and playlists into podcast RSS feeds",
 };
 
 export default function RootLayout({

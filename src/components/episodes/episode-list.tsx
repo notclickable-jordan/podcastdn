@@ -66,35 +66,35 @@ function SortableEpisode({
       }`}
     >
       <button
-        className="touch-none text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+        className="opacity-0 group-hover:opacity-100 text-muted-foreground transition-opacity touch-none cursor-grab active:cursor-grabbing"
         {...attributes}
         {...listeners}
       >
-        <GripVertical className="h-4 w-4" />
+        <GripVertical className="w-4 h-4" />
       </button>
 
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted overflow-hidden">
+      <div className="flex justify-center items-center bg-muted rounded-lg w-10 h-10 overflow-hidden shrink-0">
         {episode.imageUrl ? (
           <img
             src={episode.imageUrl}
             alt=""
-            className="h-full w-full object-cover"
+            className="w-full h-full object-cover"
           />
         ) : (
-          <Music className="h-4 w-4 text-muted-foreground" />
+          <Music className="w-4 h-4 text-muted-foreground" />
         )}
       </div>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">
+        <p className="font-medium text-sm truncate">
           {isProcessing && (
-            <Loader2 className="inline h-3 w-3 animate-spin mr-1.5" />
+            <Loader2 className="inline mr-1.5 w-3 h-3 animate-spin" />
           )}
           {episode.title}
         </p>
         {episode.duration && (
-          <span className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-            <Clock className="h-3 w-3" />
+          <span className="flex items-center gap-1 mt-0.5 text-muted-foreground text-xs">
+            <Clock className="w-3 h-3" />
             {formatDuration(episode.duration)}
           </span>
         )}
@@ -103,10 +103,10 @@ function SortableEpisode({
       <Button
         variant="ghost"
         size="icon"
-        className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+        className="opacity-0 group-hover:opacity-100 w-8 h-8 text-muted-foreground hover:text-destructive transition-opacity"
         onClick={() => onDelete(episode.id)}
       >
-        <Trash2 className="h-3.5 w-3.5" />
+        <Trash2 className="w-3.5 h-3.5" />
       </Button>
     </div>
   );
@@ -170,10 +170,10 @@ export function EpisodeList({
 
   if (episodes.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-12 px-4">
-        <Music className="h-8 w-8 text-muted-foreground mb-3" />
-        <p className="text-sm text-muted-foreground text-center">
-          No episodes yet. Add a YouTube video or playlist above.
+      <div className="flex flex-col justify-center items-center px-4 py-12 border border-dashed rounded-2xl">
+        <Music className="mb-3 w-8 h-8 text-muted-foreground" />
+        <p className="text-muted-foreground text-sm text-center">
+          No episodes yet. Add a video or playlist above.
         </p>
       </div>
     );

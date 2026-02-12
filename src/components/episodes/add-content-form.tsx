@@ -53,11 +53,11 @@ export function AddContentForm({ podcastId }: { podcastId: string }) {
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
       <div className="relative flex-1">
-        <LinkIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <LinkIcon className="top-1/2 left-3 absolute w-4 h-4 text-muted-foreground -translate-y-1/2" />
         <Input
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="Paste a YouTube video or playlist URL…"
+          placeholder="Paste a video or playlist URL…"
           className="pl-9"
           disabled={loading}
         />
@@ -65,7 +65,7 @@ export function AddContentForm({ podcastId }: { podcastId: string }) {
       <Button type="submit" disabled={loading || !url.trim()}>
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
             Adding…
           </>
         ) : (

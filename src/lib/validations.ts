@@ -25,11 +25,6 @@ export const addContentSchema = z.object({
   url: z
     .string()
     .url("Invalid URL")
-    .refine(
-      (url) =>
-        url.includes("youtube.com") || url.includes("youtu.be"),
-      "Must be a YouTube URL"
-    ),
 });
 
 export const profileSchema = z.object({

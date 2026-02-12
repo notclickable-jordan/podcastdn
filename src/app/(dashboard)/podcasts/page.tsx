@@ -38,7 +38,7 @@ export default async function PodcastsPage() {
           </div>
           <h3 className="font-semibold text-lg">No podcasts yet</h3>
           <p className="mt-1 mb-4 max-w-sm text-muted-foreground text-sm text-center">
-            Create your first podcast to start converting YouTube videos into
+            Create your first podcast to start converting videos into
             podcast episodes.
           </p>
           <CreatePodcastDialog />

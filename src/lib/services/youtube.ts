@@ -43,7 +43,7 @@ function parseYouTubeUrl(url: string): {
     return { type: "playlist", id: listId };
   }
 
-  throw new Error("Could not parse YouTube URL");
+  throw new Error("Could not parse URL");
 }
 
 async function getVideoMetadata(videoId: string): Promise<VideoMetadata> {
