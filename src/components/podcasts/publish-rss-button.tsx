@@ -26,20 +26,20 @@ export function PublishRssButton({ podcastId }: { podcastId: string }) {
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="sm"
-      className="h-8 gap-1.5 text-xs"
+      className="gap-1.5 text-xs"
       onClick={handlePublish}
       disabled={state === "loading"}
     >
       {state === "done" ? (
         <>
-          <Check className="h-3 w-3" />
+          <Check className="w-3 h-3" />
           Published
         </>
       ) : state === "error" ? (
         <>
-          <RefreshCw className="h-3 w-3" />
+          <RefreshCw className="w-3 h-3" />
           Failed
         </>
       ) : (

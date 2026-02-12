@@ -89,6 +89,7 @@ model Episode {
   duration    Int?
   fileSize    Int?
   youtubeId   String?
+  sourceUrl   String?
   order       Int      @default(0)
   podcastId   String
   createdAt   DateTime @default(now())
@@ -103,12 +104,15 @@ model Episode {
 enum SourceType {
   video
   playlist
+  url
+  file
 }
 
 model Source {
   id          String     @id @default(cuid())
   type        SourceType
-  youtubeId   String
+  youtubeId   String?
+  sourceUrl   String?
   title       String?
   lastChecked DateTime?
   podcastId   String
@@ -133,6 +137,8 @@ enum JobType {
   download_video
   scan_playlist
   poll_sources
+  download_url
+  process_upload
 }
 
 model Job {

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { addContentSchema } from "@/lib/validations";
 import { youtube } from "@/lib/services/youtube";
+import { media } from "@/lib/services/media";
 
 export async function POST(
   request: Request,
@@ -27,8 +28,6 @@ export async function POST(
     const body = await request.json();
     const data = addContentSchema.parse(body);
 
-    const parsed = youtube.parseUrl(data.url);
-
     // Get current max order
     const maxOrder = await prisma.episode.findFirst({
       where: { podcastId: id },
@@ -37,32 +36,99 @@ export async function POST(
     });
     let nextOrder = (maxOrder?.order ?? -1) + 1;
 
-    if (parsed.type === "video") {
-      // Create episode placeholder
+    // Determine if this is a YouTube URL or a direct media URL
+    if (media.isYouTubeUrl(data.url)) {
+      const parsed = youtube.parseUrl(data.url);
+
+      if (parsed.type === "video") {
+        // Create episode placeholder
+        const episode = await prisma.episode.create({
+          data: {
+            title: `Loading: ${parsed.id}`,
+            youtubeId: parsed.id,
+            order: nextOrder,
+            podcastId: id,
+          },
+        });
+
+        // Create source
+        await prisma.source.create({
+          data: {
+            type: "video",
+            youtubeId: parsed.id,
+            podcastId: id,
+          },
+        });
+
+        // Create download job
+        const job = await prisma.job.create({
+          data: {
+            type: "download_video",
+            metadata: {
+              videoId: parsed.id,
+              podcastId: id,
+              episodeId: episode.id,
+            },
+          },
+        });
+
+        return NextResponse.json(
+          { episode, job, type: "video" },
+          { status: 201 }
+        );
+      } else {
+        // Playlist
+        await prisma.source.create({
+          data: {
+            type: "playlist",
+            youtubeId: parsed.id,
+            podcastId: id,
+          },
+        });
+
+        // Create scan job
+        const job = await prisma.job.create({
+          data: {
+            type: "scan_playlist",
+            metadata: {
+              playlistId: parsed.id,
+              podcastId: id,
+            },
+          },
+        });
+
+        return NextResponse.json(
+          { job, type: "playlist" },
+          { status: 201 }
+        );
+      }
+    } else {
+      // Direct URL — download the file directly
+      const title = media.titleFromUrl(data.url);
+
       const episode = await prisma.episode.create({
         data: {
-          title: `Loading: ${parsed.id}`,
-          youtubeId: parsed.id,
+          title: `Downloading: ${title}`,
+          sourceUrl: data.url,
           order: nextOrder,
           podcastId: id,
         },
       });
 
-      // Create source
       await prisma.source.create({
         data: {
-          type: "video",
-          youtubeId: parsed.id,
+          type: "url",
+          sourceUrl: data.url,
+          title,
           podcastId: id,
         },
       });
 
-      // Create download job
       const job = await prisma.job.create({
         data: {
-          type: "download_video",
+          type: "download_url",
           metadata: {
-            videoId: parsed.id,
+            url: data.url,
             podcastId: id,
             episodeId: episode.id,
           },
@@ -70,32 +136,7 @@ export async function POST(
       });
 
       return NextResponse.json(
-        { episode, job, type: "video" },
-        { status: 201 }
-      );
-    } else {
-      // Playlist
-      await prisma.source.create({
-        data: {
-          type: "playlist",
-          youtubeId: parsed.id,
-          podcastId: id,
-        },
-      });
-
-      // Create scan job
-      const job = await prisma.job.create({
-        data: {
-          type: "scan_playlist",
-          metadata: {
-            playlistId: parsed.id,
-            podcastId: id,
-          },
-        },
-      });
-
-      return NextResponse.json(
-        { job, type: "playlist" },
+        { episode, job, type: "url" },
         { status: 201 }
       );
     }

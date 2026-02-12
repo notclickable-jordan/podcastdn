@@ -4,7 +4,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Rss } from "lucide-react";
 import { EpisodeList } from "@/components/episodes/episode-list";
-import { AddContentForm } from "@/components/episodes/add-content-form";
+import { AddContentDialog } from "@/components/episodes/add-content-dialog";
 import { CopyButton } from "@/components/podcasts/copy-button";
 import { PublishRssButton } from "@/components/podcasts/publish-rss-button";
 import { ExportPodcastButton } from "@/components/podcasts/export-podcast-button";
@@ -45,8 +45,9 @@ export default async function PodcastDetailPage({
           Back to podcasts
         </Link>
         <div className="flex items-center gap-2">
-          <PublishRssButton podcastId={podcast.id} />
+          <AddContentDialog podcastId={podcast.id} />
           <ExportPodcastButton podcastId={podcast.id} />
+          <PublishRssButton podcastId={podcast.id} />
         </div>
       </div>
 
@@ -63,8 +64,8 @@ export default async function PodcastDetailPage({
           </div>
         </div>
 
-        {/* Right column — RSS feed + add content */}
-        <div className="space-y-4 w-full lg:w-80 xl:w-96 shrink-0">
+        {/* Right column — RSS feed */}
+        <div className="w-full lg:w-80 xl:w-96 shrink-0">
           {/* RSS Feed URL */}
           <div className="flex items-center gap-2 bg-card p-3 border rounded-xl">
             <Rss className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -72,14 +73,6 @@ export default async function PodcastDetailPage({
               {rssUrl}
             </code>
             <CopyButton text={rssUrl} />
-          </div>
-
-          {/* Add Content */}
-          <div className="space-y-2">
-            <h2 className="font-medium text-muted-foreground text-sm">
-              Add Content
-            </h2>
-            <AddContentForm podcastId={podcast.id} />
           </div>
         </div>
       </div>
