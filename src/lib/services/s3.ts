@@ -29,7 +29,7 @@ function getBucketName() {
 
 function getPublicUrl(key: string): string {
   if (process.env.CUSTOM_DOMAIN) {
-    return `https://${process.env.CUSTOM_DOMAIN}/${key}`;
+    return `${process.env.CUSTOM_DOMAIN.replace(/\/$/, "")}/${key}`;
   }
   if (process.env.CLOUDFRONT_DOMAIN) {
     return `https://${process.env.CLOUDFRONT_DOMAIN}/${key}`;

@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, LinkIcon, Upload, Loader2, FileAudio } from "lucide-react";
+import { Plus, LinkIcon, Upload, Loader2, FileAudio, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 
 const ACCEPTED_EXTENSIONS =
@@ -26,12 +26,14 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
   const [url, setUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function reset() {
     setUrl("");
     setFile(null);
     setLoading(false);
+    setSuccessMessage(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -62,13 +64,12 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
         url: "URL queued for download",
       };
 
-      toast({
-        title: messages[data.type] || "Content queued for processing",
-        variant: "success",
-      });
-
-      reset();
+      setUrl("");
+      setLoading(false);
+      setSuccessMessage(messages[data.type] || "Content added");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setOpen(false);
+      setSuccessMessage(null);
       router.refresh();
     } catch (err) {
       toast({
@@ -102,13 +103,15 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
         throw new Error(data.error || "Failed to upload file");
       }
 
-      toast({
-        title: "File queued for processing",
-        variant: "success",
-      });
-
-      reset();
+      setFile(null);
+      setLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      setSuccessMessage("File queued for processing");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setOpen(false);
+      setSuccessMessage(null);
       router.refresh();
     } catch (err) {
       toast({
@@ -144,6 +147,12 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
           <DialogTitle>Add Content</DialogTitle>
         </DialogHeader>
 
+        {successMessage ? (
+          <div className="flex flex-col justify-center items-center gap-3 py-8">
+            <CheckCircle2 className="w-10 h-10 text-green-500" />
+            <p className="font-medium text-sm">{successMessage}</p>
+          </div>
+        ) : (
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="w-full">
             <TabsTrigger value="url" className="flex-1 gap-1.5">
@@ -248,6 +257,7 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
             </form>
           </TabsContent>
         </Tabs>
+        )}
       </DialogContent>
     </Dialog>
   );

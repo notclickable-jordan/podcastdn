@@ -103,7 +103,7 @@ function formatItunesDuration(seconds: number): string {
 }
 
 function getPublicBaseUrl(): string {
-  if (process.env.CUSTOM_DOMAIN) return `https://${process.env.CUSTOM_DOMAIN}`;
+  if (process.env.CUSTOM_DOMAIN) return process.env.CUSTOM_DOMAIN.replace(/\/$/, "");
   if (process.env.CLOUDFRONT_DOMAIN) return `https://${process.env.CLOUDFRONT_DOMAIN}`;
   return process.env.NEXTAUTH_URL || "http://localhost:3000";
 }
