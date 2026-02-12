@@ -43,16 +43,16 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toasts, toast, dismiss }}>
       {children}
-      <div className="top-4 left-1/2 z-100 fixed flex flex-col gap-2 max-w-sm -translate-x-1/2">
+      <div className="top-16.5 left-1/2 z-100 fixed flex flex-col gap-2 max-w-sm -translate-x-1/2">
         {toasts.map((t) => (
           <div
             key={t.id}
-            className={`relative rounded-xl border px-4 py-3 pr-8 shadow-lg backdrop-blur-sm transition-all duration-300 animate-in slide-in-from-top-4 fade-in ${
+            className={`relative rounded-xl border px-4 py-3 pr-8 shadow-lg transition-all duration-300 animate-in slide-in-from-top-4 fade-in ${
               t.variant === "destructive"
-                ? "border-destructive/30 bg-destructive/10 text-destructive"
+                ? "border-destructive bg-red-100 text-destructive dark:bg-red-950"
                 : t.variant === "success"
-                  ? "border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400"
-                  : "border-border bg-background text-foreground"
+                  ? "border-green-500 bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400"
+                  : "border-border bg-white text-foreground dark:bg-zinc-900"
             }`}
             role="alert"
           >
