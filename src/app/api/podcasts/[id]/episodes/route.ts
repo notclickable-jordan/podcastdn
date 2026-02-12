@@ -84,6 +84,8 @@ export async function POST(
             metadata: {
               playlistId: parsed.id,
               podcastId: id,
+              ...(data.limit != null ? { limit: data.limit } : {}),
+              ...(data.skip != null ? { skip: data.skip } : {}),
             },
           },
         });

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Cloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,7 +45,22 @@ export default function RegisterPage() {
         throw new Error(data.error || "Registration failed");
       }
 
-      router.push("/login");
+      const email = formData.get("email") as string;
+      const password = formData.get("password") as string;
+
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        // Account was created but auto-sign-in failed; fall back to login page
+        router.push("/login");
+        return;
+      }
+
+      router.push("/podcasts");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {

@@ -2,6 +2,8 @@ import {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
 import {
   CloudFrontClient,
@@ -29,7 +31,7 @@ function getBucketName() {
 
 function getPublicUrl(key: string): string {
   if (process.env.CUSTOM_DOMAIN) {
-    return `https://${process.env.CUSTOM_DOMAIN}/${key}`;
+    return `${process.env.CUSTOM_DOMAIN.replace(/\/$/, "")}/${key}`;
   }
   if (process.env.CLOUDFRONT_DOMAIN) {
     return `https://${process.env.CLOUDFRONT_DOMAIN}/${key}`;
@@ -72,17 +74,17 @@ async function uploadFile(
 
 async function uploadAudio(
   filePath: string,
-  podcastId: string,
+  folderName: string,
   episodeId: string,
   onProgress?: UploadProgressCallback
 ): Promise<string> {
-  const key = `${podcastId}/episodes/${episodeId}/audio.mp3`;
+  const key = `${folderName}/episodes/${episodeId}/audio.mp3`;
   return uploadFile(filePath, key, "audio/mpeg", onProgress);
 }
 
 async function uploadArtwork(
   filePath: string,
-  podcastId: string,
+  folderName: string,
   episodeId?: string,
   onProgress?: UploadProgressCallback
 ): Promise<string> {
@@ -91,8 +93,8 @@ async function uploadArtwork(
     ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
 
   const key = episodeId
-    ? `${podcastId}/episodes/${episodeId}/artwork${ext}`
-    : `${podcastId}/artwork${ext}`;
+    ? `${folderName}/episodes/${episodeId}/artwork${ext}`
+    : `${folderName}/artwork${ext}`;
 
   return uploadFile(filePath, key, contentType, onProgress);
 }
@@ -122,6 +124,39 @@ async function deleteFile(key: string): Promise<void> {
       Key: key,
     })
   );
+}
+
+async function deleteFolder(prefix: string): Promise<void> {
+  const client = getS3Client();
+  const bucket = getBucketName();
+
+  let continuationToken: string | undefined;
+  do {
+    const list = await client.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix.endsWith("/") ? prefix : `${prefix}/`,
+        ContinuationToken: continuationToken,
+      })
+    );
+
+    const objects = list.Contents;
+    if (objects && objects.length > 0) {
+      await client.send(
+        new DeleteObjectsCommand({
+          Bucket: bucket,
+          Delete: {
+            Objects: objects.map((o) => ({ Key: o.Key! })),
+            Quiet: true,
+          },
+        })
+      );
+    }
+
+    continuationToken = list.IsTruncated
+      ? list.NextContinuationToken
+      : undefined;
+  } while (continuationToken);
 }
 
 async function invalidateCloudFront(paths: string[]): Promise<void> {
@@ -156,6 +191,7 @@ export const s3 = {
   uploadFile,
   uploadContent,
   deleteFile,
+  deleteFolder,
   getPublicUrl,
   invalidateCloudFront,
 };

@@ -37,6 +37,7 @@ export async function GET(
       language: podcast.language,
       category: podcast.category,
       explicit: podcast.explicit,
+      s3FolderName: podcast.s3FolderName,
     },
     episodes: podcast.episodes.map((ep) => ({
       id: ep.id,

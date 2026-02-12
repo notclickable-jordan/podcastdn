@@ -4,6 +4,8 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -12,11 +14,20 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, LinkIcon, Upload, Loader2, FileAudio } from "lucide-react";
+import { Plus, LinkIcon, Upload, Loader2, FileAudio, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 
 const ACCEPTED_EXTENSIONS =
   ".mp3,.m4a,.aac,.ogg,.oga,.opus,.wav,.flac,.wma,.aiff,.aif,.mp4,.mkv,.webm,.avi,.mov,.wmv,.flv,.m4v,.mpg,.mpeg,.3gp,.ogv";
+
+function looksLikePlaylist(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return !!u.searchParams.get("list");
+  } catch {
+    return false;
+  }
+}
 
 export function AddContentDialog({ podcastId }: { podcastId: string }) {
   const router = useRouter();
@@ -26,12 +37,24 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
   const [url, setUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Playlist limit/skip controls
+  const [allVideos, setAllVideos] = useState(true);
+  const [limit, setLimit] = useState(5);
+  const [skip, setSkip] = useState(0);
+
+  const isPlaylist = looksLikePlaylist(url);
 
   function reset() {
     setUrl("");
     setFile(null);
     setLoading(false);
+    setSuccessMessage(null);
+    setAllVideos(true);
+    setLimit(5);
+    setSkip(0);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -43,10 +66,16 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
     setLoading(true);
 
     try {
+      const body: Record<string, unknown> = { url };
+      if (isPlaylist && !allVideos) {
+        body.limit = limit;
+        body.skip = skip;
+      }
+
       const res = await fetch(`/api/podcasts/${podcastId}/episodes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
@@ -62,13 +91,12 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
         url: "URL queued for download",
       };
 
-      toast({
-        title: messages[data.type] || "Content queued for processing",
-        variant: "success",
-      });
-
-      reset();
+      setUrl("");
+      setLoading(false);
+      setSuccessMessage(messages[data.type] || "Content added");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setOpen(false);
+      setSuccessMessage(null);
       router.refresh();
     } catch (err) {
       toast({
@@ -102,13 +130,15 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
         throw new Error(data.error || "Failed to upload file");
       }
 
-      toast({
-        title: "File queued for processing",
-        variant: "success",
-      });
-
-      reset();
+      setFile(null);
+      setLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      setSuccessMessage("File queued for processing");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       setOpen(false);
+      setSuccessMessage(null);
       router.refresh();
     } catch (err) {
       toast({
@@ -144,6 +174,12 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
           <DialogTitle>Add Content</DialogTitle>
         </DialogHeader>
 
+        {successMessage ? (
+          <div className="flex flex-col justify-center items-center gap-3 py-8">
+            <CheckCircle2 className="w-10 h-10 text-green-500" />
+            <p className="font-medium text-sm">{successMessage}</p>
+          </div>
+        ) : (
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="w-full">
             <TabsTrigger value="url" className="flex-1 gap-1.5">
@@ -175,6 +211,77 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
                   />
                 </div>
               </div>
+
+              {isPlaylist && (
+                <div className="space-y-3 bg-muted/50 p-3 border rounded-lg">
+                  <div className="flex justify-between items-center gap-3">
+                    <Label
+                      htmlFor="all-videos"
+                      className="font-medium text-sm cursor-pointer"
+                    >
+                      Import all videos
+                    </Label>
+                    <Switch
+                      id="all-videos"
+                      checked={allVideos}
+                      onCheckedChange={setAllVideos}
+                      disabled={loading}
+                    />
+                  </div>
+
+                  {!allVideos && (
+                    <div className="space-y-3 pt-1">
+                      <div className="flex items-center gap-3">
+                        <Label
+                          htmlFor="playlist-skip"
+                          className="w-24 min-w-24 text-sm"
+                        >
+                          Skip first
+                        </Label>
+                        <Input
+                          id="playlist-skip"
+                          type="number"
+                          min={0}
+                          value={skip}
+                          onChange={(e) =>
+                            setSkip(Math.max(0, parseInt(e.target.value) || 0))
+                          }
+                          className="w-20"
+                          disabled={loading}
+                        />
+                        <span className="text-muted-foreground text-sm">
+                          videos
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Label
+                          htmlFor="playlist-limit"
+                          className="w-24 min-w-24 text-sm"
+                        >
+                          Then take
+                        </Label>
+                        <Input
+                          id="playlist-limit"
+                          type="number"
+                          min={1}
+                          value={limit}
+                          onChange={(e) =>
+                            setLimit(
+                              Math.max(1, parseInt(e.target.value) || 1)
+                            )
+                          }
+                          className="w-20"
+                          disabled={loading}
+                        />
+                        <span className="text-muted-foreground text-sm">
+                          videos
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <Button
                 type="submit"
                 disabled={loading || !url.trim()}
@@ -248,6 +355,7 @@ export function AddContentDialog({ podcastId }: { podcastId: string }) {
             </form>
           </TabsContent>
         </Tabs>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { podcastSchema } from "@/lib/validations";
 import { publishRssFeed, deleteRssFeed } from "@/lib/services/rss";
+import { s3 } from "@/lib/services/s3";
 
 export async function GET(
   _request: Request,
@@ -52,7 +53,7 @@ export async function PUT(
 
   try {
     const body = await request.json();
-    const data = podcastSchema.partial().parse(body);
+    const { s3FolderName: _ignored, ...data } = podcastSchema.partial().parse(body);
 
     const podcast = await prisma.podcast.update({
       where: { id },
@@ -75,7 +76,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
@@ -93,10 +94,20 @@ export async function DELETE(
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  await prisma.podcast.delete({ where: { id } });
+  const url = new URL(request.url);
+  const deleteFiles = url.searchParams.get("deleteFiles") !== "false";
 
-  // Clean up RSS feed from S3
-  await deleteRssFeed(id).catch(() => {});
+  // Delete S3 files for the entire podcast folder if requested
+  if (deleteFiles) {
+    const folder = existing.s3FolderName || id;
+    await s3.deleteFolder(folder).catch(() => {});
+    await s3.invalidateCloudFront([`/${folder}/*`]).catch(() => {});
+  } else {
+    // Still clean up the RSS feed even if not deleting all files
+    await deleteRssFeed(id).catch(() => {});
+  }
+
+  await prisma.podcast.delete({ where: { id } });
 
   return NextResponse.json({ success: true });
 }

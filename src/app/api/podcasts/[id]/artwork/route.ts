@@ -49,7 +49,7 @@ export async function POST(
       const buffer = Buffer.from(await file.arrayBuffer());
       await fs.writeFile(tmpPath, buffer);
 
-      const artworkUrl = await s3.uploadArtwork(tmpPath, id);
+      const artworkUrl = await s3.uploadArtwork(tmpPath, existing.s3FolderName || id);
 
       const podcast = await prisma.podcast.update({
         where: { id },

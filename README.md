@@ -59,7 +59,7 @@ npm run dev
 | `AWS_SECRET_ACCESS_KEY` | AWS secret key | Yes |
 | `S3_BUCKET_NAME` | S3 bucket name | Yes |
 | `CLOUDFRONT_DOMAIN` | CloudFront distribution domain | No |
-| `CUSTOM_DOMAIN` | Custom domain for media URLs | No |
+| `CUSTOM_DOMAIN` | Fully qualified custom domain for media URLs (e.g. `https://media.example.com`) | No |
 | `POLLING_INTERVAL_MINUTES` | How often to check for new playlist videos (default: 60) | No |
 
 ## S3 Bucket Setup
