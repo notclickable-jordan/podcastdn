@@ -24,7 +24,7 @@ export default async function PodcastDetailPage({
   const podcast = await prisma.podcast.findFirst({
     where: { id, userId: session.user.id },
     include: {
-      episodes: { orderBy: { order: "asc" } },
+      episodes: { orderBy: { createdAt: "desc" } },
       sources: true,
     },
   });
@@ -82,7 +82,13 @@ export default async function PodcastDetailPage({
         <h2 className="font-medium text-muted-foreground text-sm">
           Episodes
         </h2>
-        <EpisodeList episodes={podcast.episodes} podcastId={podcast.id} />
+        <EpisodeList
+          episodes={podcast.episodes.map((e) => ({
+            ...e,
+            createdAt: e.createdAt.toISOString(),
+          }))}
+          podcastId={podcast.id}
+        />
       </div>
     </div>
   );

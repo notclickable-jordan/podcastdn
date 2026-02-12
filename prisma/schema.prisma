@@ -90,7 +90,6 @@ model Episode {
   fileSize    Int?
   youtubeId   String?
   sourceUrl   String?
-  order       Int      @default(0)
   podcastId   String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

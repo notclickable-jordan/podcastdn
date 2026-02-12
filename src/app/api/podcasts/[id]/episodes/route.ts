@@ -28,14 +28,6 @@ export async function POST(
     const body = await request.json();
     const data = addContentSchema.parse(body);
 
-    // Get current max order
-    const maxOrder = await prisma.episode.findFirst({
-      where: { podcastId: id },
-      orderBy: { order: "desc" },
-      select: { order: true },
-    });
-    let nextOrder = (maxOrder?.order ?? -1) + 1;
-
     // Determine if this is a YouTube URL or a direct media URL
     if (media.isYouTubeUrl(data.url)) {
       const parsed = youtube.parseUrl(data.url);
@@ -46,7 +38,6 @@ export async function POST(
           data: {
             title: `Loading: ${parsed.id}`,
             youtubeId: parsed.id,
-            order: nextOrder,
             podcastId: id,
           },
         });
@@ -110,7 +101,6 @@ export async function POST(
         data: {
           title: `Downloading: ${title}`,
           sourceUrl: data.url,
-          order: nextOrder,
           podcastId: id,
         },
       });

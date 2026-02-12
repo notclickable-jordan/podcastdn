@@ -8,7 +8,7 @@ export async function generateRssFeed(podcastId: string): Promise<string> {
     include: {
       episodes: {
         where: { audioUrl: { not: null } },
-        orderBy: { order: "asc" },
+        orderBy: { createdAt: "desc" },
       },
       user: { select: { name: true, email: true } },
     },

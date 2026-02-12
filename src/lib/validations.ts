@@ -45,7 +45,3 @@ export const profileSchema = z.object({
   },
   { message: "Current password is required to set a new password", path: ["currentPassword"] }
 );
-
-export const reorderSchema = z.object({
-  episodeIds: z.array(z.string()),
-});

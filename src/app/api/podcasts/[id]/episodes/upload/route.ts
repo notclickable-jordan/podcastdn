@@ -64,20 +64,11 @@ export async function POST(
       );
     }
 
-    // Get current max order
-    const maxOrder = await prisma.episode.findFirst({
-      where: { podcastId: id },
-      orderBy: { order: "desc" },
-      select: { order: true },
-    });
-    const nextOrder = (maxOrder?.order ?? -1) + 1;
-
     // Create episode placeholder
     const title = media.titleFromFilename(file.name);
     const episode = await prisma.episode.create({
       data: {
         title: `Processing: ${title}`,
-        order: nextOrder,
         podcastId: id,
       },
     });

@@ -16,7 +16,7 @@ export async function GET(
   const podcast = await prisma.podcast.findFirst({
     where: { id, userId: session.user.id },
     include: {
-      episodes: { orderBy: { order: "asc" } },
+      episodes: { orderBy: { createdAt: "desc" } },
       sources: true,
     },
   });
@@ -47,7 +47,6 @@ export async function GET(
       duration: ep.duration,
       fileSize: ep.fileSize,
       youtubeId: ep.youtubeId,
-      order: ep.order,
     })),
     sources: podcast.sources.map((src) => ({
       id: src.id,

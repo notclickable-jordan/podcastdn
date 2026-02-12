@@ -246,14 +246,6 @@ export async function processPlaylistScan(jobId: string) {
     );
     console.log(`[job:${jobId}] Found ${newVideos.length} new video(s) (${existingIds.size} already exist)`);
 
-    // Get current max order
-    const maxOrder = await prisma.episode.findFirst({
-      where: { podcastId: metadata.podcastId },
-      orderBy: { order: "desc" },
-      select: { order: true },
-    });
-    let nextOrder = (maxOrder?.order ?? -1) + 1;
-
     // Create episodes and download jobs for new videos
     for (const video of newVideos) {
       const episode = await prisma.episode.create({
@@ -262,7 +254,6 @@ export async function processPlaylistScan(jobId: string) {
           description: video.description,
           youtubeId: video.id,
           duration: video.duration,
-          order: nextOrder++,
           podcastId: metadata.podcastId,
         },
       });

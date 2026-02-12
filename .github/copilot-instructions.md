@@ -38,5 +38,5 @@ A self-hosted Next.js application that converts YouTube videos and playlists int
 - **Service modules**: `src/lib/services/` exports namespace objects (e.g., `youtube.parseUrl()`, `s3.uploadAudio()`) rather than bare functions
 - **UI components**: shadcn/ui in `src/components/ui/` (Radix primitives + Tailwind CSS v4). Use `cn()` from `@/lib/utils` for conditional class merging
 - **Auth pattern**: NextAuth v5 with JWT strategy. Middleware in `src/middleware.ts` protects `/podcasts/*`, `/settings/*`, `/jobs/*`, and their API counterparts
-- **Episode ordering**: Episodes have an `order` field for drag-and-drop reordering via dnd-kit. New episodes get `max(order) + 1`
+- **Episode ordering**: Episodes are ordered by `createdAt` descending (newest first)
 - **Docker**: Standalone output mode (`next.config.mjs`) for Docker deployment

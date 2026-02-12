@@ -18,7 +18,7 @@ export async function GET(
   const podcast = await prisma.podcast.findFirst({
     where: { id, userId: session.user.id },
     include: {
-      episodes: { orderBy: { order: "asc" } },
+      episodes: { orderBy: { createdAt: "desc" } },
       sources: true,
       _count: { select: { episodes: true } },
     },
