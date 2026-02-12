@@ -8,7 +8,7 @@ on:
 
 env:
   USER: ${{ vars.DOCKER_USER }} # e.g. jordanroher
-  REPO: podcast-generator
+  REPO: PodCastDN
 
 jobs:
   build:
