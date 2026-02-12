@@ -4,7 +4,7 @@ Podcast => CDN = **PodCastDN**
 
 A self-hosted YouTube video/playlist to podcast generator that uploads to S3 and CloudFront.
 
-**WARNING:** This project was largely written by Claude Opus 4.6. Be careful trusting it with your secrets.
+**WARNING:** This project was largely written by Claude Opus 4.6. Be careful trusting it with your credentials.
 
 # Features
 
