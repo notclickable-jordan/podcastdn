@@ -1,6 +1,6 @@
-# AWS configuration
+# AWS Configuration
 
-Set up:
+Steps:
 
 1. **S3 bucket** to hold the files
 1. **CloudFront distribution** for caching and a shorter URL

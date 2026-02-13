@@ -4,7 +4,7 @@
 
 1. Rename `.env.example` to `.env`
 1. Set your environment variables in that file
-1. Start the Docker containers
+1. Start the [Docker](../compose.yml) containers
     ``` bash
     docker compose up -d
     ```

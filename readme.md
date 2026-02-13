@@ -18,6 +18,6 @@ A self-hosted YouTube video/playlist to podcast generator that uploads to S3 and
 
 # Getting started
 
-1. [Set up your AWS storage and get the access and secret keys](docs/aws.md)
+1. [Set up AWS and get the access and secret keys](docs/aws.md)
 1. [Configure environment variables](docs/env.md)
 1. [Run the server](docs/dev.md)
